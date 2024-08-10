@@ -1,0 +1,1 @@
+Where the parts that make up a project are stored
