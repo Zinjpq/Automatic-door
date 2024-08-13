@@ -58,13 +58,22 @@ Describe the major features of your project.
 Explain how to use the project. You can provide code snippets or command examples here:
 
 ```bash
-npm start
-# or
-python main.py
-```
+npm i requirements.txt
 
+cd main
+
+pnpm i # install all files from vercel
+
+pnpm run dev # Run webserver
+
+```
+## Việc của Hằng
+- Lấy mã từ RFID
+- Giao tiếp UART
+- Điều khiển servo quay 180 độ trong 5s rồi quay về ban đầu trong 3s.
+- 
  
-Những thứ cần mua:
+### Những thứ cần mua:
 - Đế nạp esp32-cam
 - OV2640 5MP
 - RFID - RC522
