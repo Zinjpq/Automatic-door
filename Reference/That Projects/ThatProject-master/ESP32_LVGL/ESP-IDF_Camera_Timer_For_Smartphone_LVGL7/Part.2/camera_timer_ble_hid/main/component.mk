@@ -1,2 +1,0 @@
-#
-# "main" pseudo-component makefile.
