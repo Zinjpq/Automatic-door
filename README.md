@@ -78,6 +78,6 @@ Servo :
  
 ### Những thứ cần mua:
 - Đế nạp esp32-cam
-- OV2640 5MP
+- OV5640
 - RFID - RC522
 - SG90
