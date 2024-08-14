@@ -1,4 +1,4 @@
-# Automatic door using Esp32-cam, web Nestjs and OpenCV
+# Automatic door using Esp32-Cam, Web Nestjs and OpenCV
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.1.0-brightgreen.svg)
@@ -68,10 +68,10 @@ pnpm run dev # Run webserver
 
 ```
 ## Việc của Hằng
-- Lấy mã từ RFID
-- Giao tiếp UART
-- Điều khiển servo quay 180 độ trong 5s rồi quay về ban đầu trong 3s.
-- 
+- RFID: Quét mã RFID sẽ chạy 1 servo 90 độ có biến thời gian quay là const thay đổi được đặt ở đầu.
+- UART: nếu gửi chữ "1" thì 1 servo sẽ quay 90 độ( nên tạo cùng 1 hàm để sử dụng lại ) còn nếu gửi "2" thì 2 servo sẽ quay 90 độ. 
+- LCD: hiển thị ra được màn hình lcd1602a cái gì cũng được 
+- Về cái UART em cứ hiểu cái serial.print chính là gửi đi rồi nên xem lại thì nó sẽ gửi luôn lại ở phần đọc của serial.
  
 ### Những thứ cần mua:
 - Đế nạp esp32-cam
