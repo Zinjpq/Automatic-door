@@ -67,7 +67,7 @@ pnpm i # install all files from vercel
 pnpm run dev # Run webserver
 
 ```
-## Việc của Hằng
+## Việc của Hằng: 
 - RFID + Servo: Quét mã RFID sẽ chạy 1 servo 90 độ có biến thời gian quay là const thay đổi được đặt ở đầu. RFID :
 [Phần 1](https://www.youtube.com/watch?v=gZ4hLL-SfdA),
 [Phần 2](https://www.youtube.com/watch?v=2RNliD0wpN8).
