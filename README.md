@@ -14,6 +14,7 @@
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
+- [Hang's_job](#Hang's_job)
 
 ## Overview
 
@@ -67,8 +68,9 @@ pnpm i # install all files from vercel
 pnpm run dev # Run webserver
 
 ```
-## Việc của Hằng: 
-- RFID + Servo: Quét mã RFID sẽ chạy 1 servo 90 độ có biến thời gian quay là const thay đổi được đặt ở đầu. RFID :
+## Hang's_job: 
+- RFID + Servo: Quét mã RFID sẽ chạy 1 servo 90 độ có biến thời gian quay là const thay đổi được đặt ở đầu. 
+> RFID :
 [Phần 1](https://www.youtube.com/watch?v=gZ4hLL-SfdA),
 [Phần 2](https://www.youtube.com/watch?v=2RNliD0wpN8).
 Servo : 
@@ -76,3 +78,8 @@ Servo :
 - UART: nếu gửi chữ "1" thì 1 servo sẽ quay 90 độ( nên tạo cùng 1 hàm để sử dụng lại ) còn nếu gửi "2" thì 2 servo sẽ quay 90 độ. Phần này trên youtube dạy lung tung nên hỏi chatgpt cho nhanh. Còn có tài liệu của UART của thầy Mạnh anh để ở file ngoài cùng đó. Về cái UART em cứ hiểu cái serial.print chính là gửi đi rồi nên xem lại thì nó sẽ gửi luôn lại ở phần đọc của serial. TX là Transmission pins còn RX là Reception pins nên ta phải đối ngược 2 cái của 2 thiết bị với nhau còn muốn test hoạt động hay không thì nối 2 cái lại là nó gửi cho chính nó :))
 - LCD: hiển thị ra được màn hình lcd1602a cái gì cũng được. Tài liệu anh cũng up trong file luôn. Chú ý phần khai báo, nên dùng loại 4 bit còn sau sau anh đưa cho cái có I2C.
 - Tiệm cận: nếu có vật cản thì sau khi quay 90 độ quay lại thì sẽ dừng cho đến khi nào hết vật cản sau khoảng 4s thì mới quay 90 độ ngược lại.
+
+-> Tổng hợp thành 1 file nhận được tín hiệu UART từ esp32-cam. Tín hiệu nếu là "1" thì mở 1 servo quay 90 độ trong 4s và nếu tín hiệu là "2" thì 2 servo quay 90 độ trong 4s. Khi mở sẽ hiển thị ra LCD là mở 1 hay 2 cánh. Phần tiệm cận là 1 trong 2 điều kiện cùng với tín hiệu UART để đóng cửa, nếu tiệm cận có tín hiệu thì sẽ không đóng cửa. Quét RFID chỉ mở 1 cửa.
+
+**Hạn là 22h00, 15/9/2024.**
+
