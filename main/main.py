@@ -17,12 +17,12 @@ while True:
     for plate_image in plate_images:
         plate_text = library.recognize_plate(plate_image, "pytesseract")
         print(plate_text)
-        # if plate_text and library.check_plate(plate_text) and plate_text not in detected_plates:
-        #     detected_plates.append(plate_text)
-        #     print(f"Detected Plate: {plate_text} at {datetime.now()}")
-    # if library.check_plate(plate_text):
-    #     print('Plate detected')
-    #     library.save_image(plate_images, '.jpg')
+        if plate_text and library.check_plate(plate_text) and plate_text not in detected_plates:
+            detected_plates.append(plate_text)
+            print(f"Detected Plate: {plate_text} at {datetime.now()}")
+    if library.check_plate(plate_text):
+        print('Plate detected')
+        library.save_image(plate_images, '.jpg')
 
     cv2.namedWindow("Automatic Door", cv2.WINDOW_AUTOSIZE)
     cv2.imshow('Automatic Door', image)
@@ -32,7 +32,6 @@ while True:
     # if library.check_plate(text):
     #     print('Plate detected')
     #     library.save_image(text, '.jpg')
-    # Add a condition to break the loop
 
     key = cv2.waitKey(5)
     if key == ord('q'):
