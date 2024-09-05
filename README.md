@@ -1,8 +1,10 @@
-# Automatic door using Esp32-Cam, Web Nestjs and OpenCV
+# Automatic Door System using ESP32-CAM, NestJS, and OpenCV
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.1.0-brightgreen.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
+
+Welcome to the Automatic Door System project! This project integrates **ESP32-CAM**, **NestJS**, and **OpenCV** to create an automated door system that recognizes license plates and controls door access.
 
 ## Table of Contents
 
@@ -14,75 +16,141 @@
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
-- [Hang's_job](#Hang's_job)
+- [Hang's Job](#hangs-job)
 
 ## Overview
 
-This project I'm working on is still in the process of being completed so please wait a few more months. And this readme version is also a work in progress. 
+This project aims to build a smart automatic door system capable of recognizing license plates using **ESP32-CAM** and **OpenCV**. The system sends relevant data to a **NestJS**-powered web server, which processes the information and manages door control actions.
 
-This is an automatic door model using esp32-cam to automatically recognize license plates and send the necessary data to the web server.
+This README is a work in progress, and the project is still under active development. Stay tuned for updates!
 
 ## Features
 
-- Feature 1
-- Feature 2
-- Feature 3
-
-Describe the major features of your project.
+- **License Plate Recognition**: Automatically detects and identifies vehicle license plates using the ESP32-CAM and OpenCV.
+- **Remote Control**: Control the door remotely through a web server powered by NestJS.
+- **Secure Access**: The door only opens for recognized license plates, providing secure access.
+- **Customizable Actions**: Configurable actions such as door open/close timings and security features.
+- **Real-time Monitoring**: Monitor access logs in real-time via the web interface.
 
 ## Installation
 
 ### Prerequisites
 
-- List any dependencies or system requirements here.
+Make sure you have the following installed:
+
+- **Node.js** (v14 or higher)
+- **Python** (for OpenCV integration)
+- **ESP32-CAM module**
+- **RFID module** (optional, for RFID-based access)
 
 ### Steps
 
-1. Clone the repository:
+1. **Clone the repository**:
     ```bash
     git clone https://github.com/your-username/project-name.git
     ```
-2. Navigate to the project directory:
+2. **Navigate to the project directory**:
     ```bash
     cd project-name
     ```
-3. Install the necessary dependencies:
+3. **Install dependencies**:
+    For the web server:
     ```bash
     npm install
-    # or
+    ```
+    For the OpenCV setup:
+    ```bash
     pip install -r requirements.txt
     ```
-4. (Optional) Provide any additional setup steps here.
+4. **Setup ESP32-CAM**:
+    Flash the appropriate firmware on the ESP32-CAM following [this guide](link-to-guide).
+
+5. **Start the web server**:
+    ```bash
+    npm run start
+    ```
 
 ## Usage
 
-Explain how to use the project. You can provide code snippets or command examples here:
+To run the project, follow these steps:
 
-```bash
-npm i requirements.txt
+1. Install dependencies:
+    ```bash
+    npm install
+    ```
 
-cd main
+2. Start the web server:
+    ```bash
+    npm run dev
+    ```
 
-pnpm i # install all files from vercel
+3. Connect the ESP32-CAM to the system and ensure it's broadcasting video and capturing images for license plate recognition.
 
-pnpm run dev # Run webserver
+4. Access the web interface at `http://localhost:3000` to monitor and control the door.
 
-```
-## Hang's_job: 
-- RFID + Servo: Quét mã RFID sẽ chạy 1 servo 90 độ có biến thời gian quay là const thay đổi được đặt ở đầu. 
-> RFID :
-[Phần 1](https://www.youtube.com/watch?v=gZ4hLL-SfdA),
-[Phần 2](https://www.youtube.com/watch?v=2RNliD0wpN8).
-Servo : 
-[Link](https://www.youtube.com/watch?v=0sWor4_BW2I&t=734s).
-- UART: nếu gửi chữ "1" thì 1 servo sẽ quay 90 độ( nên tạo cùng 1 hàm để sử dụng lại ) còn nếu gửi "2" thì 2 servo sẽ quay 90 độ. Phần này trên youtube dạy lung tung nên hỏi chatgpt cho nhanh. Còn có tài liệu của UART của thầy Mạnh anh để ở file ngoài cùng đó. Về cái UART em cứ hiểu cái serial.print chính là gửi đi rồi nên xem lại thì nó sẽ gửi luôn lại ở phần đọc của serial. TX là Transmission pins còn RX là Reception pins nên ta phải đối ngược 2 cái của 2 thiết bị với nhau còn muốn test hoạt động hay không thì nối 2 cái lại là nó gửi cho chính nó :))
-- LCD: hiển thị ra được màn hình lcd1602a cái gì cũng được. Tài liệu anh cũng up trong file luôn. Chú ý phần khai báo, nên dùng loại 4 bit còn sau sau anh đưa cho cái có I2C.
-- Tiệm cận: nếu có vật cản thì sau khi quay 90 độ quay lại thì sẽ dừng cho đến khi nào hết vật cản sau khoảng 4s thì mới quay 90 độ ngược lại.
+### Example Commands
 
--> Tổng hợp thành 1 file nhận được tín hiệu UART từ esp32-cam. Tín hiệu nếu là "1" thì mở 1 servo quay 90 độ trong 4s và nếu tín hiệu là "2" thì 2 servo quay 90 độ trong 4s. Khi mở sẽ hiển thị ra LCD là mở 1 hay 2 cánh. Phần tiệm cận là 1 trong 2 điều kiện cùng với tín hiệu UART để đóng cửa, nếu tiệm cận có tín hiệu thì sẽ không đóng cửa. Quét RFID chỉ mở 1 cửa.
+- **To recognize a license plate**:
+    ```bash
+    python recognize_plate.py --image path/to/image
+    ```
 
-**Hạn là 22h00, 15/9/2024.**
+## Screenshots
 
+Include screenshots here to give users a visual understanding of the project in action. (e.g., system dashboard, license plate recognition, door control).
 
-[Github Tutorial](https://www.youtube.com/playlist?list=PLQH9LiOP43c33JLu6VYLFyLNS4xCM7RwM)
-dùng github desktop thay vì git nếu mới làm quen kết hợp với copilot free từ education để tối ưu hơn, gửi anh acc để anh liên kết luôn với repositories này
+## Hang's Job
+
+This section outlines the implementation details for the hardware and peripheral components. Here’s a breakdown:
+
+### RFID + Servo Integration
+- **RFID Module**: Scanning an RFID tag will trigger the servo to rotate by 90 degrees.
+  - [RFID Setup Part 1](https://www.youtube.com/watch?v=gZ4hLL-SfdA)
+  - [RFID Setup Part 2](https://www.youtube.com/watch?v=2RNliD0wpN8)
+
+- **Servo Motor Control**: The servo rotates by 90 degrees when a signal is received.
+  - [Servo Setup](https://www.youtube.com/watch?v=0sWor4_BW2I&t=734s)
+
+### UART Communication
+- Sending a signal `"1"` will rotate one servo by 90 degrees, and signal `"2"` will rotate two servos by 90 degrees.
+- Use `serial.print` to transmit data via UART. The **TX** pin is for transmission, and the **RX** pin is for receiving. For testing, loop the TX and RX pins together.
+
+### LCD Display
+- Use the **LCD1602A** display to show status messages like “Door 1 Open” or “Door 2 Open.”
+- Ensure correct initialization (4-bit mode recommended).
+
+### Proximity Sensor
+- Detect objects in front of the door. If an obstacle is present, the door will not close. After 4 seconds without obstacles, the door will close.
+
+### Combined System Flow
+- The system will receive signals from **ESP32-CAM** over UART.
+- `"1"` opens one door; `"2"` opens both doors. LCD displays the action.
+- Proximity sensors prevent the door from closing if an obstacle is detected.
+
+**Deadline**: September 15, 2024, 22:00.
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository.
+2. Create a new feature branch (`git checkout -b feature-name`).
+3. Commit your changes (`git commit -m 'Add new feature'`).
+4. Push to the branch (`git push origin feature-name`).
+5. Open a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For any inquiries, please reach out to:
+
+- **Your Name**: [email@example.com](mailto:email@example.com)
+- **GitHub**: [Your GitHub Profile](https://github.com/your-username)
+
+---
+
+### Useful Resources
+- [GitHub Tutorial](https://www.youtube.com/playlist?list=PLQH9LiOP43c33JLu6VYLFyLNS4xCM7RwM) — A helpful playlist for getting started with GitHub and using GitHub Desktop.
