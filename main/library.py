@@ -16,6 +16,7 @@ def check_plate(plate_text):
     ]
     return any(re.match(pattern, plate_text) for pattern in patterns)
 
+
 # cach dung cua ham tren
 # for plate_image in plate_images:
 #             plate_text = recognize_plate(plate_image)
@@ -37,6 +38,7 @@ def save_image(image, file_path):
     file_name = f"{timestamp}_{file_path}"
     cv2.imwrite(file_name, image)
 
+
 # Hàm để phát hiện và vẽ hộp bao quanh biển số xe
 def detect_license_plate(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -50,17 +52,17 @@ def detect_license_plate(image):
 
     return image, plate_images
 
+
 # Hàm để nhận diện ký tự trong biển số xe
 def recognize_plate(plate_image, method):
     if method == "pytesseract":
         # PSM 8 là chế độ tốt nhất cho nhận diện ký tự đơn
-        plate_text = pytesseract.image_to_string(plate_image,config='--psm 8')  
-        return plate_text.strip()  
-    elif method == "easyocr": 
-        reader = easyocr.Reader(['en']) 
+        plate_text = pytesseract.image_to_string(plate_image, config='--psm 8')
+        return plate_text.strip()
+    elif method == "easyocr":
+        reader = easyocr.Reader(['en'])
         results = reader.readtext(plate_image)
         plate_text = ''.join([result[1] for result in results])
         return plate_text.strip()
     else:
         raise ValueError("Phương pháp không hợp lệ. Vui lòng chọn 'pytesseract' hoặc 'easyocr'.")
-    
