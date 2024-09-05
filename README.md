@@ -83,3 +83,6 @@ Servo :
 
 **Hạn là 22h00, 15/9/2024.**
 
+
+[Github Tutorial](https://www.youtube.com/playlist?list=PLQH9LiOP43c33JLu6VYLFyLNS4xCM7RwM)
+dùng github desktop thay vì git nếu mới làm quen kết hợp với copilot free từ education để tối ưu hơn, gửi anh acc để anh liên kết luôn với repositories này

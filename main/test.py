@@ -2,9 +2,6 @@ import cv2
 import numpy as np
 import pytesseract
 
-# Đường dẫn đến Tesseract
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Cấu hình đúng đường dẫn nếu trên hệ thống của bạn
-
 def detect_license_plate(image_path):
     # Đọc ảnh
     image = cv2.imread(image_path)
@@ -59,7 +56,7 @@ def save_characters(characters, output_folder):
         cv2.imwrite(char_path, char_image)
 
 # Sử dụng hàm để phát hiện biển số và tách các ký tự
-image_path = 'image5.jpg'
+image_path = 'image4.jpg'
 license_plate = detect_license_plate(image_path)
 
 if license_plate is not None:
