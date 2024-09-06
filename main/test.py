@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import pytesseract
+import os
 
 def detect_license_plate(image_path):
     # Đọc ảnh
@@ -51,12 +52,28 @@ def extract_characters(license_plate_image):
     return characters
 
 def save_characters(characters, output_folder):
+    # Tạo thư mục nếu chưa tồn tại
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
     for idx, char_image in enumerate(characters):
-        char_path = f"{output_folder}/char_{idx}.png"
+        # Resize hình ảnh ký tự để OCR dễ nhận diện
+        resized_char = cv2.resize(char_image, (50, 80))
+        
+        # Sử dụng Tesseract OCR để nhận diện ký tự
+        recognized_char = pytesseract.image_to_string(resized_char, config='--psm 10').strip()
+        
+        # Kiểm tra ký tự có hợp lệ không (đảm bảo chỉ chứa ký tự hoặc số)
+        if recognized_char.isalnum():
+            char_path = f"{output_folder}/{recognized_char}.png"
+        else:
+            char_path = f"{output_folder}/unknown_{idx}.png"  # Nếu không nhận diện được thì lưu thành 'unknown'
+        
+        # Lưu ký tự thành file ảnh
         cv2.imwrite(char_path, char_image)
 
 # Sử dụng hàm để phát hiện biển số và tách các ký tự
-image_path = 'image4.jpg'
+image_path = 'image/image2.jpg'
 license_plate = detect_license_plate(image_path)
 
 if license_plate is not None:

@@ -127,7 +127,7 @@ This section outlines the implementation details for the hardware and peripheral
 - `"1"` opens one door; `"2"` opens both doors. LCD displays the action.
 - Proximity sensors prevent the door from closing if an obstacle is detected.
 
-**Deadline**: September 15, 2024, 22:00.
+**Deadline**: September 21, 2024, 22:00.
 
 ## Contributing
 
