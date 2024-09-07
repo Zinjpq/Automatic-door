@@ -1,90 +1,55 @@
 import cv2
 import numpy as np
-import pytesseract
 import os
 
-def detect_license_plate(image_path):
-    # Đọc ảnh
-    image = cv2.imread(image_path)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    
-    # Phát hiện cạnh
-    edged = cv2.Canny(blur, 30, 200)
-    
-    # Tìm các contour
-    contours, _ = cv2.findContours(edged, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # Lọc các contour có thể là biển số xe
-    license_plate = None
-    for contour in contours:
-        # Tìm hình chữ nhật xung quanh contour
-        x, y, w, h = cv2.boundingRect(contour)
-        aspect_ratio = w / float(h)
-        
-        # Kiểm tra tỷ lệ chiều dài, chiều cao phù hợp với biển số
-        if 2 <= aspect_ratio <= 6:  # Giả định tỷ lệ của biển số
-            license_plate = image[y:y + h, x:x + w]
-            break
-    
-    # Nếu tìm thấy biển số xe, trả về
-    if license_plate is not None:
-        return license_plate
-    else:
-        return None
+# Hàm để load các ký tự từ thư viện ký tự
+def load_char_library(library_path):
+    char_dict = {}
+    for filename in os.listdir(library_path):
+        if filename.endswith(".png"):  # Giả sử ký tự lưu dưới dạng PNG
+            char = filename[0]  # Giả định tên file là ký tự, ví dụ 'A.png'
+            img = cv2.imread(os.path.join(library_path, filename), 0)  # Load ảnh mức xám
+            char_dict[char] = img
+    return char_dict
 
-def extract_characters(license_plate_image):
-    # Chuyển đổi biển số thành ảnh grayscale và nhị phân
-    gray_plate = cv2.cvtColor(license_plate_image, cv2.COLOR_BGR2GRAY)
-    _, binary_plate = cv2.threshold(gray_plate, 128, 255, cv2.THRESH_BINARY_INV)
+# Hàm để nhận diện ký tự từ ảnh biển số xe
+def recognize_license_plate(image_path, char_library):
+    # Load ảnh biển số xe
+    plate_img = cv2.imread(image_path, 0)
     
-    # Tìm các contour của các ký tự
-    contours, _ = cv2.findContours(binary_plate, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Tiền xử lý: Chuyển sang ảnh nhị phân
+    _, binary_img = cv2.threshold(plate_img, 127, 255, cv2.THRESH_BINARY_INV)
     
-    characters = []
+    # Tìm các contour (vùng ký tự)
+    contours, _ = cv2.findContours(binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    recognized_text = ""
+    
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
+        char_img = binary_img[y:y+h, x:x+w]  # Cắt ký tự
         
-        # Cắt từng ký tự
-        char_image = binary_plate[y:y + h, x:x + w]
-        characters.append(char_image)
+        # Tìm ký tự tương ứng từ thư viện
+        best_match = None
+        best_score = float('inf')
+        for char, template in char_library.items():
+            resized_char_img = cv2.resize(char_img, (template.shape[1], template.shape[0]))
+            score = np.sum((template - resized_char_img) ** 2)  # Tính độ lệch bình phương
+            if score < best_score:
+                best_score = score
+                best_match = char
+        
+        recognized_text += best_match
     
-    return characters
+    return recognized_text
 
-def save_characters(characters, output_folder):
-    # Tạo thư mục nếu chưa tồn tại
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-    
-    for idx, char_image in enumerate(characters):
-        # Resize hình ảnh ký tự để OCR dễ nhận diện
-        resized_char = cv2.resize(char_image, (50, 80))
-        
-        # Sử dụng Tesseract OCR để nhận diện ký tự
-        recognized_char = pytesseract.image_to_string(resized_char, config='--psm 10').strip()
-        
-        # Kiểm tra ký tự có hợp lệ không (đảm bảo chỉ chứa ký tự hoặc số)
-        if recognized_char.isalnum():
-            char_path = f"{output_folder}/{recognized_char}.png"
-        else:
-            char_path = f"{output_folder}/unknown_{idx}.png"  # Nếu không nhận diện được thì lưu thành 'unknown'
-        
-        # Lưu ký tự thành file ảnh
-        cv2.imwrite(char_path, char_image)
+# Sử dụng
+char_library_path = "char_library/1"
+license_plate_image = 'image/image11.jpg'
 
-# Sử dụng hàm để phát hiện biển số và tách các ký tự
-image_path = 'image/image2.jpg'
-license_plate = detect_license_plate(image_path)
+# Load thư viện ký tự
+char_library = load_char_library(char_library_path)
 
-if license_plate is not None:
-    cv2.imshow("License Plate", license_plate)
-    characters = extract_characters(license_plate)
-    
-    # Lưu các ký tự
-    save_characters(characters, './char_library')
-    print("Saved characters to './char_library'")
-else:
-    print("License plate not found")
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# Nhận diện biển số xe
+recognized_plate = recognize_license_plate(license_plate_image, char_library)
+print("Biển số xe:", recognized_plate)

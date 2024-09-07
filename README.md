@@ -16,7 +16,6 @@ Welcome to the Automatic Door System project! This project integrates **ESP32-CA
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
-- [Hang's Job](#hangs-job)
 
 ## Overview
 
@@ -98,36 +97,6 @@ To run the project, follow these steps:
 ## Screenshots
 
 Include screenshots here to give users a visual understanding of the project in action. (e.g., system dashboard, license plate recognition, door control).
-
-## Hang's Job
-
-This section outlines the implementation details for the hardware and peripheral components. Here’s a breakdown:
-
-### RFID + Servo Integration
-- **RFID Module**: Scanning an RFID tag will trigger the servo to rotate by 90 degrees.
-  - [RFID Setup Part 1](https://www.youtube.com/watch?v=gZ4hLL-SfdA)
-  - [RFID Setup Part 2](https://www.youtube.com/watch?v=2RNliD0wpN8)
-
-- **Servo Motor Control**: The servo rotates by 90 degrees when a signal is received.
-  - [Servo Setup](https://www.youtube.com/watch?v=0sWor4_BW2I&t=734s)
-
-### UART Communication
-- Sending a signal `"1"` will rotate one servo by 90 degrees, and signal `"2"` will rotate two servos by 90 degrees.
-- Use `serial.print` to transmit data via UART. The **TX** pin is for transmission, and the **RX** pin is for receiving. For testing, loop the TX and RX pins together.
-
-### LCD Display
-- Use the **LCD1602A** display to show status messages like “Door 1 Open” or “Door 2 Open.”
-- Ensure correct initialization (4-bit mode recommended).
-
-### Proximity Sensor
-- Detect objects in front of the door. If an obstacle is present, the door will not close. After 4 seconds without obstacles, the door will close.
-
-### Combined System Flow
-- The system will receive signals from **ESP32-CAM** over UART.
-- `"1"` opens one door; `"2"` opens both doors. LCD displays the action.
-- Proximity sensors prevent the door from closing if an obstacle is detected.
-
-**Deadline**: September 21, 2024, 22:00.
 
 ## Contributing
 
