@@ -137,7 +137,7 @@ The goal of this project is to:
 
 - [GitHub Tutorial](https://www.youtube.com/playlist?list=PLQH9LiOP43c33JLu6VYLFyLNS4xCM7RwM) — A helpful playlist for getting started with GitHub and recommending use GitHub Desktop.
 - [Arduino Components and Libraries](https://youtube.com/playlist?list=PLQH9LiOP43c0PZqBtf1zBjtphZnkln0AN&si=o8JU_rhS4OZeefNO) — Understand how to use Arduino components and libraries.
-
+- [UART](https://www.programmingboss.com/2021/04/esp32-arduino-serial-communication-with-code.html#gsc.tab=0) - This is almost done, just find a way to send it back.
 ## Timeline
 
 ![Timeline](Images/timeline_with_H.png)
