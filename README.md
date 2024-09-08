@@ -99,35 +99,59 @@ To run the project, follow these steps:
 
 Include screenshots here to give users a visual understanding of the project in action. (e.g., system dashboard, license plate recognition, door control).
 
-## Hang's Job
+# Hang's Job
 
-This section outlines the implementation details for the hardware and peripheral components. Here’s a breakdown:
+This project involves working with Arduino and ESP32 to control servos via UART signals and display messages on an LCD. The servos' positions will be saved in EEPROM to retain the state during power interruptions.
 
-### RFID + Servo Integration
-- **RFID Module**: Scanning an RFID tag will trigger the servo to rotate by 90 degrees.
-  - [RFID Setup Part 1](https://www.youtube.com/watch?v=gZ4hLL-SfdA)
-  - [RFID Setup Part 2](https://www.youtube.com/watch?v=2RNliD0wpN8)
+## Overview
 
-- **Servo Motor Control**: The servo rotates by 90 degrees when a signal is received.
-  - [Servo Setup](https://www.youtube.com/watch?v=0sWor4_BW2I&t=734s)
+The goal of this project is to:
+- Upload specific code files to GitHub.
+- Control one or two servos based on UART input.
+- Display messages on an LCD.
+- Save and retrieve servo angles from EEPROM after power interruptions.
+- Ensure that servo positions reset after 15 seconds unless blocked by an infrared sensor.
 
-### UART Communication
-- Sending a signal `"1"` will rotate one servo by 90 degrees, and signal `"2"` will rotate two servos by 90 degrees.
-- Use `serial.print` to transmit data via UART. The **TX** pin is for transmission, and the **RX** pin is for receiving. For testing, loop the TX and RX pins together.
+## Tasks
 
-### LCD Display
-- Use the **LCD1602A** display to show status messages like “Door 1 Open” or “Door 2 Open.”
-- Ensure correct initialization (4-bit mode recommended).
+1. **Uploading Files to GitHub**:
+    - Ensure familiarity with GitHub and how to upload files using GitHub Desktop or the Git command line.
+    - Upload two files named `r3.ino` and `esp32.ino` into a folder called `Arduino` in the root directory of the repository.
 
-### Proximity Sensor
-- Detect objects in front of the door. If an obstacle is present, the door will not close. After 4 seconds without obstacles, the door will close.
+2. **File Requirements**:
+    - **`r3.ino`**:
+        - Read UART signals, specifically the characters `1` and `2`.
+        - If the UART signal is `1`, rotate one servo by 90 degrees.
+        - If the UART signal is `2`, rotate two servos by 90 degrees.
+        - The servo speed should be adjustable via a variable at the beginning of the file.
+        - After 15 seconds, the servo(s) should return to 0 degrees unless blocked by an infrared sensor. This feature can be implemented using a timer.
+        - Display the following messages on the LCD1602A (with I2C interface):
+            - "Open the left door" when one servo is active.
+            - "Open 2 doors" when both servos are active.
+        - Save the angles of both servos to EEPROM so that if power is lost and restored, the servos will continue from their last positions.
 
-### Combined System Flow
-- The system will receive signals from **ESP32-CAM** over UART.
-- `"1"` opens one door; `"2"` opens both doors. LCD displays the action.
-- Proximity sensors prevent the door from closing if an obstacle is detected.
+    - **`esp32.ino`**:
+        - Create a function to send UART signals with the characters `1` and `2`.
 
-**Deadline**: September 15, 2024, 22:00.
+## Useful Resources
+
+- [GitHub Tutorial](https://www.youtube.com/playlist?list=PLQH9LiOP43c33JLu6VYLFyLNS4xCM7RwM) — A helpful playlist for getting started with GitHub and recommending use GitHub Desktop.
+- [Arduino Components and Libraries](https://youtube.com/playlist?list=PLQH9LiOP43c0PZqBtf1zBjtphZnkln0AN&si=o8JU_rhS4OZeefNO) — Understand how to use Arduino components and libraries.
+
+## Timeline
+
+![Timeline](Images/timeline_with_H.png)
+
+In this section, we will document the progress and task completion status for Hang:
+- [x] This is an example
+- [ ] Learn how to upload files to GitHub.
+- [ ] Upload `r3.ino` and `esp32.ino` to the `Arduino` folder in the root directory.
+- [ ] Implement UART signal handling in `r3.ino`.
+- [ ] Implement servo control based on UART input.
+- [ ] Add LCD1602A display logic.
+- [ ] Save servo positions to EEPROM.
+- [ ] Implement infrared sensor check for resetting servo position.
+- [ ] Create UART signal sending function in `esp32.ino`.
 
 ## Contributing
 
@@ -147,10 +171,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For any inquiries, please reach out to:
 
-- **Your Name**: [email@example.com](mailto:email@example.com)
-- **GitHub**: [Your GitHub Profile](https://github.com/your-username)
+- **Your Name**: [quangvinh07032003@gmail.com](mailto:quangvinh07032003@gmail.com)
+- **GitHub**: [Zinjpq](https://github.com/Zinjpq)
 
 ---
-
-### Useful Resources
-- [GitHub Tutorial](https://www.youtube.com/playlist?list=PLQH9LiOP43c33JLu6VYLFyLNS4xCM7RwM) — A helpful playlist for getting started with GitHub and using GitHub Desktop.
