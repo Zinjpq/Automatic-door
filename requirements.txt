@@ -1,6 +1,0 @@
-opencv
-pnpm
-
-# Arduino IDE
-esp32cam-main.zip
-
