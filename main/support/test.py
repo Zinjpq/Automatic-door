@@ -1,55 +1,64 @@
 import cv2
-import numpy as np
-import os
+import tkinter as tk
+from tkinter import Label
+from PIL import Image, ImageTk
+import time
 
-# Hàm để load các ký tự từ thư viện ký tự
-def load_char_library(library_path):
-    char_dict = {}
-    for filename in os.listdir(library_path):
-        if filename.endswith(".png"):  # Giả sử ký tự lưu dưới dạng PNG
-            char = filename[0]  # Giả định tên file là ký tự, ví dụ 'A.png'
-            img = cv2.imread(os.path.join(library_path, filename), 0)  # Load ảnh mức xám
-            char_dict[char] = img
-    return char_dict
+# Hàm lấy luồng video từ ESP32-CAM
+def update_video():
+    ret, frame = cap.read()
+    if ret:
+        # Chuyển đổi frame từ OpenCV sang định dạng Tkinter
+        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(img)
+        imgtk = ImageTk.PhotoImage(image=img)
+        video_label.imgtk = imgtk
+        video_label.config(image=imgtk)
+    # Gọi lại hàm sau 10ms để cập nhật video
+    root.after(10, update_video)
 
-# Hàm để nhận diện ký tự từ ảnh biển số xe
-def recognize_license_plate(image_path, char_library):
-    # Load ảnh biển số xe
-    plate_img = cv2.imread(image_path, 0)
+# Hàm cập nhật biển số và thời gian (giả định)
+def update_plate_info():
+    # Giả lập biển số nhận dạng
+    license_plate = "30E-12345"
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
     
-    # Tiền xử lý: Chuyển sang ảnh nhị phân
-    _, binary_img = cv2.threshold(plate_img, 127, 255, cv2.THRESH_BINARY_INV)
+    plate_label.config(text=f"Biển số: {license_plate}")
+    time_label.config(text=f"Thời gian: {timestamp}")
     
-    # Tìm các contour (vùng ký tự)
-    contours, _ = cv2.findContours(binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    recognized_text = ""
-    
-    for contour in contours:
-        x, y, w, h = cv2.boundingRect(contour)
-        char_img = binary_img[y:y+h, x:x+w]  # Cắt ký tự
-        
-        # Tìm ký tự tương ứng từ thư viện
-        best_match = None
-        best_score = float('inf')
-        for char, template in char_library.items():
-            resized_char_img = cv2.resize(char_img, (template.shape[1], template.shape[0]))
-            score = np.sum((template - resized_char_img) ** 2)  # Tính độ lệch bình phương
-            if score < best_score:
-                best_score = score
-                best_match = char
-        
-        recognized_text += best_match
-    
-    return recognized_text
+    # Cập nhật thông tin biển số sau 5 giây
+    root.after(5000, update_plate_info)
 
-# Sử dụng
-char_library_path = "char_library/1"
-license_plate_image = 'image/image11.jpg'
+# Khởi tạo cửa sổ Tkinter
+root = tk.Tk()
+root.geometry("1440x1024")
 
-# Load thư viện ký tự
-char_library = load_char_library(char_library_path)
+# Tạo label để hiển thị video
+video_label = Label(root)
+video_label.pack(side="top", fill="both", expand=True)
 
-# Nhận diện biển số xe
-recognized_plate = recognize_license_plate(license_plate_image, char_library)
-print("Biển số xe:", recognized_plate)
+# Tạo label hiển thị biển số xe
+plate_label = Label(root, text="Biển số: ", font=("Arial", 20))
+plate_label.pack(side="left", padx=10, pady=10)
+
+# Tạo label hiển thị thời gian
+time_label = Label(root, text="Thời gian: ", font=("Arial", 20))
+time_label.pack(side="right", padx=10, pady=10)
+
+# Kết nối tới ESP32-CAM (thay bằng địa chỉ IP thực của ESP32-CAM)
+# esp32_url = "http://192.168.1.100:81/stream"
+cap = cv2.VideoCapture(0)
+# cap = cv2.VideoCapture(esp32_url)
+
+# Gọi hàm cập nhật video
+update_video()
+
+# Gọi hàm cập nhật thông tin biển số
+update_plate_info()
+
+# Chạy giao diện
+root.mainloop()
+
+# Giải phóng camera khi tắt ứng dụng
+cap.release()
+cv2.destroyAllWindows()
