@@ -1,10 +1,10 @@
-# Automatic Door System using ESP32-CAM, NestJS, and OpenCV
+# Automatic Door System
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.1.0-brightgreen.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
 
-Welcome to the Automatic Door System project! This project integrates **ESP32-CAM**, **NestJS**, and **OpenCV** to create an automated door system that recognizes license plates and controls door access.
+Welcome to the Automatic Door System project! This project integrates **ESP32-CAM**, **Tkinter**, and **OpenCV** to create an automated door system that recognizes license plates and controls door access.
 
 ## Table of Contents
 
