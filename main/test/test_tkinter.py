@@ -27,7 +27,7 @@ def update_plate_info():
     time_label.config(text=f"Thời gian: {timestamp}")
     
     # Cập nhật thông tin biển số sau 5 giây
-    root.after(5000, update_plate_info)
+    root.after(1000, update_plate_info)
 
 # Khởi tạo cửa sổ Tkinter
 root = tk.Tk()
