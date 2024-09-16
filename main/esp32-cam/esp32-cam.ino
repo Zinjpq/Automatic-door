@@ -1,71 +1,43 @@
-#include <WebServer.h>
 #include <WiFi.h>
-#include <esp32cam.h>
+#include <WebServer.h>
 
-const char* WIFI_SSID = "Zinj";
-const char* WIFI_PASS = "A12345678!";
+const char* ssid = "Sòu";
+const char* password = "10101010";
 
-WebServer server(80);
+WebServer server(80);  // Khởi tạo web server tại cổng 80
 
-// Sử dụng độ phân giải cao nhất
-static auto hiRes = esp32cam::Resolution::find(800, 600);
-
-void serveJpg(){
-  auto frame = esp32cam::capture();
-  if (frame == nullptr) {
-    Serial.println("CAPTURE FAIL");
-    server.send(503, "", "");
-    return;
-  }
-  Serial.printf("CAPTURE OK %dx%d %db\n", frame->getWidth(), frame->getHeight(),
-                static_cast<int>(frame->size()));
-
-  server.setContentLength(frame->size());
-  server.send(200, "image/jpeg");
-  WiFiClient client = server.client();
-  frame->writeTo(client);
+void handleOpen() {
+  server.send(200, "text/plain", "Cửa đang mở!"); // Phản hồi khi nhận yêu cầu 'open'
+  // Thực hiện hành động mở cửa tại đây (nếu cần thiết)
+  Serial.println("Cửa đang mở!");
 }
 
-void handleJpgHi()
-{
-  if (!esp32cam::Camera.changeResolution(hiRes)) {
-    Serial.println("SET-HI-RES FAIL");
-  }
-  serveJpg();
+void handleClose() {
+  server.send(200, "text/plain", "Cửa đang đóng!"); // Phản hồi khi nhận yêu cầu 'open'
+  // Thực hiện hành động mở cửa tại đây (nếu cần thiết)
+  Serial.println("Cửa đang đóng!");
 }
 
-void setup(){
+void setup() {
   Serial.begin(115200);
-  Serial.println();
-  {
-    using namespace esp32cam;
-    Config cfg;
-    cfg.setPins(pins::AiThinker);
-    cfg.setResolution(hiRes); // Đặt độ phân giải cao nhất
-    cfg.setBufferCount(2);
-    cfg.setJpeg(80);
+  WiFi.begin(ssid, password);
 
-    bool ok = Camera.begin(cfg);
-    Serial.println(ok ? "CAMERA OK" : "CAMERA FAIL");
+  // Kết nối tới WiFi
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Đang kết nối tới WiFi...");
   }
   
-  WiFi.persistent(false);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.print("Connected! IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("Đã kết nối WiFi!");
 
-  // Chỉ cần một endpoint cho ảnh độ phân giải cao nhất
-  server.on("/cam-hi.jpg", handleJpgHi);
+  // Định nghĩa các endpoint (đường dẫn) trên server
+  server.on("/open", handleOpen); // Khi nhận yêu cầu đến đường dẫn /open, gọi hàm handleOpen
+  server.on("/close", handleClose);
 
-  server.begin();
+  server.begin(); // Bắt đầu web server
+  Serial.println("Server đã bắt đầu");
 }
 
-void loop()
-{
-  server.handleClient();
+void loop() {
+  server.handleClient(); // Lắng nghe các yêu cầu HTTP
 }

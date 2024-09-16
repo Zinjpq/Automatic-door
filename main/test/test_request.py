@@ -2,8 +2,8 @@ import requests
 import cv2  # Nếu bạn vẫn muốn sử dụng cv2
 
 # Địa chỉ IP của ESP32-CAM (thay đổi thành IP thực của ESP32 sau khi kết nối WiFi)
-url1 = 'http://192.168.3.56/open'
-url2 = 'http://192.168.3.56/close'
+url1 = 'http://192.168.0.103/open'
+url2 = 'http://192.168.0.103/close'
 
 # Hiển thị hướng dẫn sử dụng
 print("Nhấn 1 để mở cửa, 2 để đóng cửa, q để thoát")
