@@ -81,7 +81,7 @@ ctk.CTkButton(animated_panel, text='Button', corner_radius=0).pack(expand=True, 
 ctk.CTkTextbox(animated_panel, fg_color=('#dbdbdb', '#2b2b2b')).pack(expand=True, fill='both', pady=10)
 
 # button
-button_x = 0.5
+button_x = 0.5  
 button = ctk.CTkButton(window, text='toggle sidebar', command=animated_panel.animate)
 button.place(relx=button_x, rely=0.5, anchor='center')
 

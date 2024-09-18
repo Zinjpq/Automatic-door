@@ -1,64 +1,32 @@
-import cv2
-import tkinter as tk
-from tkinter import Label
-from PIL import Image, ImageTk
-import time
+from tkinter import *
+import customtkinter
 
-# Hàm lấy luồng video từ ESP32-CAM
-def update_video():
-    ret, frame = cap.read()
-    if ret:
-        # Chuyển đổi frame từ OpenCV sang định dạng Tkinter
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(img)
-        imgtk = ImageTk.PhotoImage(image=img)
-        video_label.imgtk = imgtk
-        video_label.config(image=imgtk)
-    # Gọi lại hàm sau 10ms để cập nhật video
-    root.after(10, update_video)
+customtkinter.set_appearance_mode("dark")
+customtkinter.set_default_color_theme("dark-blue")
 
-# Hàm cập nhật biển số và thời gian (giả định)
-def update_plate_info():
-    # Giả lập biển số nhận dạng
-    license_plate = "30E-12345"
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    
-    plate_label.config(text=f"Biển số: {license_plate}")
-    time_label.config(text=f"Thời gian: {timestamp}")
-    
-    # Cập nhật thông tin biển số sau 1 giây
-    root.after(1000, update_plate_info)
+root = customtkinter.CTk()
 
-# Khởi tạo cửa sổ Tkinter
-root = tk.Tk()
-root.geometry("1440x1024")
+root.title('Button tutorial')
+root.iconbitmap('klee2.ico')
+root.geometry('1280x720')
 
-# Tạo label để hiển thị video
-video_label = Label(root)
-video_label.pack(side="top", fill="both", expand=True)
 
-# Tạo label hiển thị biển số xe
-plate_label = Label(root, text="Biển số: ", font=("Arial", 20))
-plate_label.pack(side="left", padx=10, pady=10)
+def hello():
+    pass
 
-# Tạo label hiển thị thời gian
-time_label = Label(root, text="Thời gian: ", font=("Arial", 20))
-time_label.pack(side="right", padx=10, pady=10)
 
-# Kết nối tới ESP32-CAM (thay bằng địa chỉ IP thực của ESP32-CAM)
-# esp32_url = "http://192.168.1.100:81/stream"
-cap = cv2.VideoCapture(0)
-# cap = cv2.VideoCapture(esp32_url)
+my_button = customtkinter.CTkButton(root,
+                                    text="hello world!",
+                                    command=hello,
+                                    fg_color="white",
+                                    text_color="black",
+                                    height=48,
+                                    width=224,
+                                    corner_radius=16,
+                                    border_width=2,
+                                    hover_color="White",
+                                    compound="top")
+my_button.pack(pady=80)
 
-# Gọi hàm cập nhật video
-update_video()
 
-# Gọi hàm cập nhật thông tin biển số
-update_plate_info()
-
-# Chạy giao diện
 root.mainloop()
-
-# Giải phóng camera khi tắt ứng dụng
-cap.release()
-cv2.destroyAllWindows()
