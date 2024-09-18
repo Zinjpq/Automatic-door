@@ -1,11 +1,12 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <EEPROM.h>
+#include <esp32cam.h>
 #include "access_point.h"
 #include "request.h"
 #include "2-axis_servo.h"
 #include "cam.h"
-#include <esp32cam.h>
+#include "2-axis_servo.h"
 
 void setup() {
   Serial.begin(115200);
@@ -32,9 +33,11 @@ void setup() {
       Serial.println("Connected to Wi-Fi");
       Serial.println(WiFi.localIP());
 
+      // Setup time
       setup_request();
       setup_access_point();
-      
+      setup_servo();
+
       server.on("/cam",handleImage);
       server.begin();
       
