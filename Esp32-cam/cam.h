@@ -1,11 +1,4 @@
-#include <WebServer.h>
-#include <WiFi.h>
 #include <esp32cam.h>
-
-const char* WIFI_SSID = "Sòu";
-const char* WIFI_PASS = "10101010";
-
-WebServer server(80);
 
 // Sử dụng độ phân giải cao nhất
 static auto hiRes = esp32cam::Resolution::find(800, 600);
@@ -26,15 +19,14 @@ void serveJpg(){
   frame->writeTo(client);
 }
 
-void handleJpgHi(){
+void handleImage(){
   if (!esp32cam::Camera.changeResolution(hiRes)) {
-    Serial.println("SET-HI-RES FAIL");
+    Serial.println("CAMERA FAIL");
   }
   serveJpg();
 }
 
-void setup(){
-  Serial.begin(115200);
+void setup_cam(){
   Serial.println();
   {
     using namespace esp32cam;
@@ -47,24 +39,4 @@ void setup(){
     bool ok = Camera.begin(cfg);
     Serial.println(ok ? "CAMERA OK" : "CAMERA FAIL");
   }
-  
-  WiFi.persistent(false);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.print("Connected! IP address: ");
-  Serial.println(WiFi.localIP());
-
-  // Chỉ cần một endpoint cho ảnh độ phân giải cao nhất
-  server.on("/cam-hi.jpg", handleJpgHi);
-
-  server.begin();
-}
-
-void loop()
-{
-  server.handleClient();
 }

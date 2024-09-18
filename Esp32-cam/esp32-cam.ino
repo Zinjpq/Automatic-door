@@ -1,43 +1,48 @@
 #include <WiFi.h>
 #include <WebServer.h>
-
-const char* ssid = "Sòu";
-const char* password = "10101010";
-
-WebServer server(80);  // Khởi tạo web server tại cổng 80
-
-void handleOpen() {
-  server.send(200, "text/plain", "Cửa đang mở!"); // Phản hồi khi nhận yêu cầu 'open'
-  // Thực hiện hành động mở cửa tại đây (nếu cần thiết)
-  Serial.println("Cửa đang mở!");
-}
-
-void handleClose() {
-  server.send(200, "text/plain", "Cửa đang đóng!"); // Phản hồi khi nhận yêu cầu 'open'
-  // Thực hiện hành động mở cửa tại đây (nếu cần thiết)
-  Serial.println("Cửa đang đóng!");
-}
+#include <EEPROM.h>
+#include "access_point.h"
+#include "request.h"
+#include "2-axis_servo.h"
+#include "cam.h"
+#include <esp32cam.h>
 
 void setup() {
   Serial.begin(115200);
-  WiFi.begin(ssid, password);
 
-  // Kết nối tới WiFi
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Đang kết nối tới WiFi...");
+  setup_cam();
+
+  // Tải thông tin Wi-Fi từ EEPROM
+  String ssid, password;
+  loadWiFiCredentials(ssid, password);
+
+  if (ssid != "" && password != "") {
+    // Cố gắng kết nối Wi-Fi đã lưu
+    WiFi.begin(ssid.c_str(), password.c_str());
+    Serial.print("Connecting to Wi-Fi");
+
+    int counter = 0;
+    while (WiFi.status() != WL_CONNECTED && counter < 10) {
+      delay(1000);
+      Serial.print(".");
+      counter++;
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("Connected to Wi-Fi");
+      Serial.println(WiFi.localIP());
+
+      setup_request();
+      setup_access_point();
+      
+      server.on("/cam",handleImage);
+      server.begin();
+      
+      return;
+    }
   }
-  
-  Serial.println("Đã kết nối WiFi!");
-
-  // Định nghĩa các endpoint (đường dẫn) trên server
-  server.on("/open", handleOpen); // Khi nhận yêu cầu đến đường dẫn /open, gọi hàm handleOpen
-  server.on("/close", handleClose);
-
-  server.begin(); // Bắt đầu web server
-  Serial.println("Server đã bắt đầu");
 }
 
 void loop() {
-  server.handleClient(); // Lắng nghe các yêu cầu HTTP
+  server.handleClient(); // Duyệt các yêu cầu HTTP từ người dùng
 }

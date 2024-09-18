@@ -152,6 +152,7 @@ In this section, we will document the progress and task completion status for Ha
 - [ ] Save servo positions to EEPROM.
 - [ ] Implement infrared sensor check for resetting servo position.
 - [ ] Create UART signal sending function in `esp32.ino`.
+- [ ] Check all above.
 
 ## Contributing
 

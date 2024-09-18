@@ -1,24 +1,6 @@
-#include <WiFi.h>
 #include <WebServer.h>
-#include <EEPROM.h>
 
 WebServer server(80);
-
-// Hàm lưu thông tin Wi-Fi vào EEPROM
-void saveWiFiCredentials(String ssid, String password) {
-  EEPROM.begin(512); // Khởi tạo EEPROM với kích thước 512 byte
-  for (int i = 0; i < ssid.length(); ++i) {
-    EEPROM.write(i, ssid[i]); // Lưu SSID vào EEPROM
-  }
-  EEPROM.write(ssid.length(), '\0'); // Kết thúc chuỗi SSID
-
-  for (int i = 0; i < password.length(); ++i) {
-    EEPROM.write(100 + i, password[i]); // Lưu Password từ địa chỉ 100
-  }
-  EEPROM.write(100 + password.length(), '\0'); // Kết thúc chuỗi Password
-
-  EEPROM.commit(); // Ghi dữ liệu xuống bộ nhớ
-}
 
 // Hàm tải thông tin Wi-Fi từ EEPROM
 void loadWiFiCredentials(String &ssid, String &password) {
@@ -37,6 +19,22 @@ void loadWiFiCredentials(String &ssid, String &password) {
     if (passwordChars[i] == '\0') break;
   }
   password = String(passwordChars);
+}
+
+// Hàm lưu thông tin Wi-Fi vào EEPROM
+void saveWiFiCredentials(String ssid, String password) {
+  EEPROM.begin(512); // Khởi tạo EEPROM với kích thước 512 byte
+  for (int i = 0; i < ssid.length(); ++i) {
+    EEPROM.write(i, ssid[i]); // Lưu SSID vào EEPROM
+  }
+  EEPROM.write(ssid.length(), '\0'); // Kết thúc chuỗi SSID
+
+  for (int i = 0; i < password.length(); ++i) {
+    EEPROM.write(100 + i, password[i]); // Lưu Password từ địa chỉ 100
+  }
+  EEPROM.write(100 + password.length(), '\0'); // Kết thúc chuỗi Password
+
+  EEPROM.commit(); // Ghi dữ liệu xuống bộ nhớ
 }
 
 // Hàm xử lý yêu cầu của người dùng khi truy cập trang chủ
@@ -69,34 +67,9 @@ void handleSave() {
   ESP.restart(); // Khởi động lại ESP32
 }
 
-void setup() {
-  Serial.begin(115200);
-
-  // Tải thông tin Wi-Fi từ EEPROM
-  String ssid, password;
-  loadWiFiCredentials(ssid, password);
-
-  if (ssid != "" && password != "") {
-    // Cố gắng kết nối Wi-Fi đã lưu
-    WiFi.begin(ssid.c_str(), password.c_str());
-    Serial.print("Connecting to Wi-Fi");
-
-    int counter = 0;
-    while (WiFi.status() != WL_CONNECTED && counter < 10) {
-      delay(1000);
-      Serial.print(".");
-      counter++;
-    }
-
-    if (WiFi.status() == WL_CONNECTED) {
-      Serial.println("Connected to Wi-Fi");
-      Serial.println(WiFi.localIP());
-      return;
-    }
-  }
-
+void setup_access_point(){
   // Nếu không kết nối được, chuyển sang AP mode
-  WiFi.softAP("ESP32-Access-Point", "12345678");
+  WiFi.softAP("ESP32-Access Point", "12345678");
   Serial.println("Failed to connect. Access Point mode started");
   Serial.println(WiFi.softAPIP());
 
@@ -104,8 +77,4 @@ void setup() {
   server.on("/", handleRoot); // Trang chủ
   server.on("/save", HTTP_POST, handleSave); // Xử lý lưu thông tin Wi-Fi
   server.begin();
-}
-
-void loop() {
-  server.handleClient(); // Duyệt các yêu cầu HTTP từ người dùng
 }
