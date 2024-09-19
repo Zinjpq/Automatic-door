@@ -2,11 +2,13 @@
 #include <WebServer.h>
 #include <EEPROM.h>
 #include <esp32cam.h>
+#include <ESP32Servo.h>
 #include "access_point.h"
 #include "request.h"
 #include "2-axis_servo.h"
 #include "cam.h"
 #include "2-axis_servo.h"
+
 
 void setup() {
   Serial.begin(115200);
@@ -36,7 +38,7 @@ void setup() {
       // Setup time
       setup_request();
       setup_access_point();
-      setup_servo();
+      setup_2servo();
 
       server.on("/cam",handleImage);
       server.begin();
