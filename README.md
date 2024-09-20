@@ -144,13 +144,13 @@ The goal of this project is to:
 
 In this section, we will document the progress and task completion status for Hang:
 - [x] This is an example
-- [ ] Learn how to upload files to GitHub.
-- [ ] Upload `r3.ino` and `esp32.ino` to the `Arduino` folder in the root directory.
+- [x] Learn how to upload files to GitHub.
+- [x] Upload `r3.ino` and `esp32.ino` to the `Arduino` folder in the root directory.
 - [ ] Implement UART signal handling in `r3.ino`.
 - [ ] Implement servo control based on UART input.
-- [ ] Add LCD1602A display logic.
-- [ ] Save servo positions to EEPROM.
-- [ ] Implement infrared sensor check for resetting servo position.
+- [x] Add LCD1602A display logic.
+- [x] Save servo positions to EEPROM.
+- [x] Implement infrared sensor check for resetting servo position.
 - [ ] Create UART signal sending function in `esp32.ino`.
 - [ ] Check all above.
 
