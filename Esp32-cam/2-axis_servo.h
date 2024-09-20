@@ -1,8 +1,7 @@
 #include <WiFi.h>
 #include <ESP32Servo.h>
 
-int panAngle;
-int tiltAngle;
+int panAngle, tiltAngle;
 
 #define stepSize 10
 #define MIN_ANGLE 0
