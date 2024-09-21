@@ -1,6 +1,4 @@
 #include <EEPROM.h>
-
-#include <EEPROM.h>
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Servo.h> 
@@ -19,11 +17,13 @@ int sensor = 2;
 int value;
 int servo_1 = 5, servo_2 = 6;
 int goc_1, goc_2;
+
 int UID[4], i, RFIDval;
 int ID1[4] = {35, 115, 238, 47};
 int ID2[4] = {163, 131, 013, 20};
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
+
 Servo myServo_1;
 Servo myServo_2;
 

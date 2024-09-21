@@ -40,7 +40,7 @@ void setup() {
       // Setup time
       setup_request();
       setup_access_point();
-      //setup_2servo();
+      setup_2servo();
 
       server.on("/cam",handleImage);
       server.begin();
