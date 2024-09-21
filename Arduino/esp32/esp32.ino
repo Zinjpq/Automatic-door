@@ -3,14 +3,17 @@
 #include <EEPROM.h>
 #include <esp32cam.h>
 #include <ESP32Servo.h>
-#include "access_point.h"
+#include "setup-wifi_access-point.h"
 #include "request.h"
-#include "2-axis_servo.h"
-#include "cam.h"
-#include "2-axis_servo.h"
+#include "pan-tilt_servo.h"
+#include "setup-esp32-cam.h"
+
+#define RXp2 16
+#define TXp2 17
 
 void setup() {
   Serial.begin(115200);
+  Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
 
   setup_cam();
 

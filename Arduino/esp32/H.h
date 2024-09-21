@@ -12,6 +12,3 @@ void Write_2()
 {
   Serial2.println("2");
 }
-void loop() {
-    
-}
