@@ -1,17 +1,52 @@
-#define RXp2 16
-#define TXp2 17
+#include <WiFi.h>
+#include <WebServer.h>
+#include <EEPROM.h>
+#include <esp32cam.h>
+#include <ESP32Servo.h>
+#include "access_point.h"
+#include "request.h"
+#include "2-axis_servo.h"
+#include "cam.h"
+#include "2-axis_servo.h"
+
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
+
+  setup_cam();
+
+  // Tải thông tin Wi-Fi từ EEPROM
+  String ssid, password;
+  loadWiFiCredentials(ssid, password);
+
+  if (ssid != "" && password != "") {
+    // Cố gắng kết nối Wi-Fi đã lưu
+    WiFi.begin(ssid.c_str(), password.c_str());
+    Serial.print("Connecting to Wi-Fi");
+
+    int counter = 0;
+    while (WiFi.status() != WL_CONNECTED && counter < 10) {
+      delay(1000);
+      Serial.print(".");
+      counter++;
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("Connected to Wi-Fi");
+      Serial.println(WiFi.localIP());
+
+      // Setup time
+      setup_request();
+      setup_access_point();
+      //setup_2servo();
+
+      server.on("/cam",handleImage);
+      server.begin();
+      
+      return;
+    }
+  }
 }
-void Write_1()
-{
-  Serial2.println("1");
-}
-void Write_2()
-{
-  Serial2.println("2");
-}
+
 void loop() {
-    
+  server.handleClient(); // Duyệt các yêu cầu HTTP từ người dùng
 }
