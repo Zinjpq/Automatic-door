@@ -23,20 +23,20 @@ void go_left(){
   panServo.write(panAngle);
 }
 
-// void go_right(){
-//   panAngle = max(panAngle + stepSize, MAX_ANGLE);  
-//   panServo.write(panAngle);
-// }
+void go_right(){
+  panAngle = max(panAngle + stepSize, MAX_ANGLE);  
+  panServo.write(panAngle);
+}
 
-// void go_up(){
-//   tiltAngle = min(tiltAngle - stepSize, MIN_ANGLE);
-//   tiltServo.write(tiltAngle);
-// }
+void go_up(){
+  tiltAngle = min(tiltAngle - stepSize, MIN_ANGLE);
+  tiltServo.write(tiltAngle);
+}
 
-// void go_down(){
-//   tiltAngle = max(tiltAngle + stepSize, MAX_ANGLE);
-//   tiltServo.write(tiltAngle);
-// }
+void go_down(){
+  tiltAngle = max(tiltAngle + stepSize, MAX_ANGLE);
+  tiltServo.write(tiltAngle);
+}
 
 void setup_2servo(){
   // Attach servos to their pins
@@ -49,8 +49,8 @@ void setup_2servo(){
 
   // Correct usage of server.on by passing function pointers
   server.on("/left", go_left);
-  // server.on("/right", panServo.write(max(panAngle + stepSize, MAX_ANGLE)));
-  // server.on("/up",    tiltServo.write(min(tiltAngle - stepSize, MIN_ANGLE)));
-  // server.on("/down",  tiltServo.write(max(tiltAngle + stepSize, MAX_ANGLE)));
+  server.on("/right", panServo.write(max(panAngle + stepSize, MAX_ANGLE)));
+  server.on("/up",    tiltServo.write(min(tiltAngle - stepSize, MIN_ANGLE)));
+  server.on("/down",  tiltServo.write(max(tiltAngle + stepSize, MAX_ANGLE)));
 
 }
