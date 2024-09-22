@@ -11,6 +11,9 @@
 #define RXp2 16
 #define TXp2 17
 
+int panAngle = 90;
+int tiltAngle = 90;
+
 void setup() {
   Serial.begin(115200);
   Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
