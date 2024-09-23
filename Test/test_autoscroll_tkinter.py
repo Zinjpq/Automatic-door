@@ -45,12 +45,12 @@ class AutoUpdateGUI(ctk.CTk):
 
 
 def capture_license_plate(folder_path, plate_number):
-    # Hàm lưu file giả lập
     current_time = time.strftime("%Y%m%d-%H%M%S")
     filename = f"{plate_number}_{current_time}.txt"
     filepath = os.path.join(folder_path, filename)
 
-    with open(filepath, "w") as f:
+    # Mở file với encoding UTF-8
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(f"Biển số: {plate_number}\nThời gian: {current_time}")
 
     print(f"Lưu file: {filename}")
