@@ -21,24 +21,28 @@ extern int tiltAngle;
 void go_left(){
   panAngle = min(panAngle - stepSize, MIN_ANGLE);  
   panServo.write(panAngle);
+  Serial.println(panAngle);
 }
 
 void go_right(){
   panAngle = max(panAngle + stepSize, MAX_ANGLE);  
   panServo.write(panAngle);
+  Serial.println(panAngle);
 }
 
 void go_up(){
   tiltAngle = min(tiltAngle - stepSize, MIN_ANGLE);
   tiltServo.write(tiltAngle);
+  Serial.println(tiltAngle);
 }
 
 void go_down(){
   tiltAngle = max(tiltAngle + stepSize, MAX_ANGLE);
   tiltServo.write(tiltAngle);
+  Serial.println(tiltAngle);
 }
 
-void setup_2servo(){
+void setup_pantiltcam(){
   // Attach servos to their pins
   panServo.attach(PAN_PIN);
   tiltServo.attach(TILT_PIN);
@@ -49,8 +53,8 @@ void setup_2servo(){
 
   // Correct usage of server.on by passing function pointers
   server.on("/left", go_left);
-  server.on("/right", panServo.write(max(panAngle + stepSize, MAX_ANGLE)));
-  server.on("/up",    tiltServo.write(min(tiltAngle - stepSize, MIN_ANGLE)));
-  server.on("/down",  tiltServo.write(max(tiltAngle + stepSize, MAX_ANGLE)));
+  server.on("/right", go_right);
+  server.on("/up", go_up);
+  server.on("/down", go_down);
 
 }

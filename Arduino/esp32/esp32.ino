@@ -16,7 +16,7 @@ int tiltAngle = 90;
 
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
+  //Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
 
   setup_cam();
 
@@ -41,15 +41,15 @@ void setup() {
       Serial.println(WiFi.localIP());
 
       // Setup time
-      setup_request();
-      setup_access_point();
-      setup_2servo();
+      //setup_request();
+      setup_pantiltcam();
 
       server.on("/cam",handleImage);
       server.begin();
       
       return;
     }
+    setup_access_point();
   }
 }
 
