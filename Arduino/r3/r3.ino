@@ -27,8 +27,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 Servo myServo_1;
 Servo myServo_2;
 
-void setup() 
-{
+void setup(){
   Serial.begin(9600);
   SPI.begin();
   mfrc522.PCD_Init();
@@ -43,21 +42,18 @@ void setup()
 
 }
 
-void RFID() {
-  if ( ! mfrc522.PICC_IsNewCardPresent()) 
-  { 
+void RFID(){
+  if ( ! mfrc522.PICC_IsNewCardPresent()){ 
     return; 
   }
   
-  if ( ! mfrc522.PICC_ReadCardSerial()) 
-  {  
+  if ( ! mfrc522.PICC_ReadCardSerial()){  
     return;  
   }
   
   Serial.print("UID của thẻ: ");   
   
-  for (byte i = 0; i < mfrc522.uid.size; i++) 
-  { 
+  for (byte i = 0; i < mfrc522.uid.size; i++){ 
     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");   
     UID[i] = mfrc522.uid.uidByte[i];
     Serial.print(UID[i]);
@@ -80,8 +76,7 @@ void loop() {
   myServo_2.write(giatri_2);
   
   RFID();
-  if (RFIDval == 1) 
-  {
+  if (RFIDval == 1){
     Serial.println("Open the left door");
     lcd.setCursor(1,0);
     lcd.print("Open");
@@ -99,8 +94,8 @@ void loop() {
     delay(15000);
     
   }
-  else if (RFIDval == 2) 
-  {
+
+  else if (RFIDval == 2){
     Serial.println("Open 2 doors");
     lcd.setCursor(1,0);
     lcd.print("Open");
@@ -118,19 +113,16 @@ void loop() {
    
     delay(15000);
     
-  } else if (RFIDval == -1) 
-  {
+  } else if (RFIDval == -1){
     Serial.println("Invalid card");
     lcd.setCursor(1,0);
     lcd.print("Invalid card");
     RFIDval = 0;
   }
   
-  if (RFIDval !=0)
-  {
+  if (RFIDval !=0){
     value = digitalRead(sensor);
-    if (value == 0 )
-    {
+    if (value == 0 ){
       lcd.clear();
       
       myServo_1.write(0);
