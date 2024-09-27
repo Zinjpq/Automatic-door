@@ -55,7 +55,7 @@ canvas.create_rectangle(
     920.0,
     177.0,
     1280.0,
-    653.0,
+    697.0,
     fill="#000000",
     outline="")
 window.resizable(False, False)

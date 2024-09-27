@@ -2,135 +2,100 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Servo.h> 
-#include <LiquidCrystal.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-LiquidCrystal_I2C lcd(0X27,16,2);
 
+// Constants and object definitions
+#define RST_PIN 9
+#define SS_PIN 10
+#define SERVO_OPEN_ANGLE 90
+#define SERVO_CLOSED_ANGLE 0
+#define DELAY_TIME 15000
 
-#define RST_PIN         9
-#define SS_PIN          10
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+MFRC522 mfrc522(SS_PIN, RST_PIN);
+Servo servo1, servo2;
 
 int diachi_1 = 1, diachi_2 = 5;
-byte giatri_1, giatri_2;
-int sensor = 2; 
-int value;
-int servo_1 = 5, servo_2 = 6;
-int goc_1, goc_2;
 
-int UID[4], i, RFIDval;
-int ID1[4] = {35, 115, 238, 47};
-int ID2[4] = {163, 131, 013, 20};
+//Sensor
+int sensorPin = 2;
 
-MFRC522 mfrc522(SS_PIN, RST_PIN);
+//RFID
+int RFIDval = 0;
+int UID[4];
 
-Servo myServo_1;
-Servo myServo_2;
+//ID 
+const int ID1[4] = {35, 115, 238, 47};
+const int ID2[4] = {163, 131, 13, 20};
 
-void setup(){
+// Setup function
+void setup() {
   Serial.begin(9600);
   SPI.begin();
   mfrc522.PCD_Init();
-
-  pinMode(sensor, INPUT);
   
-  myServo_1.attach(servo_1);
-  myServo_2.attach(servo_2);
+  pinMode(sensorPin, INPUT);
+  servo1.attach(5);
+  servo2.attach(6);
   
   lcd.init();
   lcd.backlight();
-
 }
 
-void RFID(){
-  if ( ! mfrc522.PICC_IsNewCardPresent()){ 
-    return; 
-  }
+// Function to check RFID
+void checkRFID(){
+  if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) return;
   
-  if ( ! mfrc522.PICC_ReadCardSerial()){  
-    return;  
-  }
+  for (byte i = 0; i < mfrc522.uid.size; i++) UID[i] = mfrc522.uid.uidByte[i];
   
-  Serial.print("UID của thẻ: ");   
-  
-  for (byte i = 0; i < mfrc522.uid.size; i++){ 
-    Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");   
-    UID[i] = mfrc522.uid.uidByte[i];
-    Serial.print(UID[i]);
-  }
-
-  Serial.println("   ");
-
-  if (UID[i] == ID1[i]) RFIDval = 1;
-  else if (UID[i] == ID2[i]) RFIDval = 2;
-  else RFIDval = -1;
-  
-  mfrc522.PICC_HaltA();  
+  RFIDval = (memcmp(UID, ID1, 4) == 0) ? 1 : (memcmp(UID, ID2, 4) == 0) ? 2 : -1;
+  mfrc522.PICC_HaltA();
   mfrc522.PCD_StopCrypto1();
 }
 
-void loop() {
-  EEPROM.write(diachi_1, giatri_1);
-  EEPROM.write(diachi_2, giatri_2);
-  myServo_1.write(giatri_1);
-  myServo_2.write(giatri_2);
+// Function to open servos and display message
+void openDoor(int mode){
+  const char* message = (mode == 1) ? "the left door" : "2 doors";
+  Serial.print("Open "); Serial.println(message);
   
-  RFID();
-  if (RFIDval == 1){
-    Serial.println("Open the left door");
-    lcd.setCursor(1,0);
-    lcd.print("Open");
-    lcd.setCursor(3,1);
-    lcd.print("the left door");
-      
-    myServo_1.write(90);
-    goc_1 = myServo_1.read();
-    goc_2 = myServo_2.read();
-    Serial.print("Góc servo 1: "); Serial.println(goc_1);  
-    Serial.print("Góc servo 2: "); Serial.println(goc_2);  
-    EEPROM.write(diachi_1, goc_1);
-    EEPROM.write(diachi_2, goc_2);
-    
-    delay(15000);
-    
-  }
+  lcd.clear();
+  lcd.setCursor(1, 0);
+  lcd.print("Open");
+  lcd.setCursor(3, 1);
+  lcd.print(message);
+  
+  servo1.write(SERVO_OPEN_ANGLE);
+  if (mode == 2) servo2.write(SERVO_OPEN_ANGLE);
 
-  else if (RFIDval == 2){
-    Serial.println("Open 2 doors");
-    lcd.setCursor(1,0);
-    lcd.print("Open");
-    lcd.setCursor(3,1);
-    lcd.print("2 doors");
-      
-    myServo_1.write(90);
-    myServo_2.write(90);
-    goc_1 = myServo_1.read();
-    goc_2 = myServo_2.read();
-    Serial.print("Góc servo 1: "); Serial.println(goc_1);  
-    Serial.print("Góc servo 2: "); Serial.println(goc_2);  
-    EEPROM.write(diachi_1, goc_1);
-    EEPROM.write(diachi_2, goc_2);
-   
-    delay(15000);
-    
-  } else if (RFIDval == -1){
+  saveServoPositions();
+  delay(DELAY_TIME);
+}
+
+// Save servo positions to EEPROM
+void saveServoPositions(){
+  EEPROM.write(diachi_1, servo1.read());
+  EEPROM.write(diachi_2, servo2.read());
+}
+
+// Main loop function
+void loop()1{
+  checkRFID();
+
+  if (RFIDval > 0) openDoor(RFIDval);
+  else if (RFIDval == -1) {
     Serial.println("Invalid card");
-    lcd.setCursor(1,0);
+    lcd.clear();
+    lcd.setCursor(1, 0);
     lcd.print("Invalid card");
     RFIDval = 0;
   }
-  
-  if (RFIDval !=0){
-    value = digitalRead(sensor);
-    if (value == 0 ){
-      lcd.clear();
-      
-      myServo_1.write(0);
-      myServo_2.write(0); 
-      EEPROM.write(diachi_1, goc_1);
-      EEPROM.write(diachi_2, goc_2);
-    
-      RFIDval = 0;
-    }
+
+  if (RFIDval != 0 && digitalRead(sensorPin) == LOW) {
+    lcd.clear();
+    servo1.write(SERVO_CLOSED_ANGLE);
+    servo2.write(SERVO_CLOSED_ANGLE);
+    saveServoPositions();
+    RFIDval = 0;
   }
 }
