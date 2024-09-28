@@ -27,7 +27,7 @@ def main():
         return  # and exit program
     # end if
 
-    imgOriginalScene = cv2.imread("image/image11.jpg")  # open image
+    imgOriginalScene = cv2.imread("image/9.png")  # open image
 
     if imgOriginalScene is None:  # if image was not read successfully
         print("\nerror: image not read from file \n\n")  # print error message to std out
@@ -85,7 +85,7 @@ def main():
 def drawRedRectangleAroundPlate(imgOriginalScene, licPlate):
     p2fRectPoints = cv2.boxPoints(licPlate.rrLocationOfPlateInScene)  # get 4 vertices of rotated rect
 
-    # cv2.line(imgOriginalScene, tuple(p2fRectPoints[0]), tuple(p2fRectPoints[1]), SCALAR_RED, 2)         # draw 4
+    cv2.line(imgOriginalScene, tuple(p2fRectPoints[0]), tuple(p2fRectPoints[1]), SCALAR_RED, 2)         # draw 4
     # red lines
     cv2.line(imgOriginalScene, tuple(p2fRectPoints[1]), tuple(p2fRectPoints[2]), SCALAR_RED, 2)
     cv2.line(imgOriginalScene, tuple(p2fRectPoints[2]), tuple(p2fRectPoints[3]), SCALAR_RED, 2)
