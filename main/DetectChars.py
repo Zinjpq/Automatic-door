@@ -58,8 +58,7 @@ def loadKNNDataAndTrainKNN():
 
     try:
         npaFlattenedImages = np.loadtxt("flattened_images.txt", np.float32)  # read in training images
-    except:  # if file could not be
-        # opened
+    except:  # if file could not be opened
         print("error, unable to open flattened_images.txt, exiting program\n")  # show error message
         os.system("pause")
         return False  # and return False
@@ -89,8 +88,7 @@ def detectCharsInPlates(listOfPossiblePlates):
 
     # at this point we can be sure the list of possible plates has at least one plate
 
-    for possiblePlate in listOfPossiblePlates:  # for each possible plate, this is a big for loop that takes
-        # up most of the function
+    for possiblePlate in listOfPossiblePlates:  # for each possible plate, this is a big for loop that takes up most of the function
 
         possiblePlate.imgGrayscale, possiblePlate.imgThresh = Preprocess.preprocess(
             possiblePlate.imgPlate)  # preprocess to get grayscale and threshold images
@@ -288,11 +286,13 @@ def findListOfListsOfMatchingChars(listOfPossibleChars):
 
     for possibleChar in listOfPossibleChars:  # for each possible char in the one big list of chars
         listOfMatchingChars = findListOfMatchingChars(possibleChar,
-                                                      listOfPossibleChars)  # find all chars in the big list that match the current char
+                                                      listOfPossibleChars)  # find all chars in the big list that
+        # match the current char
 
         listOfMatchingChars.append(possibleChar)  # also add the current char to current possible list of matching chars
 
-        if len(listOfMatchingChars) < MIN_NUMBER_OF_MATCHING_CHARS:  # if current possible list of matching chars is not long enough to constitute a possible plate
+        if len(listOfMatchingChars) < MIN_NUMBER_OF_MATCHING_CHARS:  # if current possible list of matching chars is
+            # not long enough to constitute a possible plate
             continue  # jump back to the top of the for loop and try again with next char, note that it's not necessary
             # to save the list in any way since it did not have enough chars to be a possible plate
         # end if
@@ -302,7 +302,7 @@ def findListOfListsOfMatchingChars(listOfPossibleChars):
 
         listOfPossibleCharsWithCurrentMatchesRemoved = []
 
-        # remove the current list of matching chars from the big list, so we don't use those same chars twice,
+        # remove the current list of matching chars from the big list so we don't use those same chars twice,
         # make sure to make a new big list for this since we don't want to change the original big list
         listOfPossibleCharsWithCurrentMatchesRemoved = list(set(listOfPossibleChars) - set(listOfMatchingChars))
 
@@ -331,8 +331,8 @@ def findListOfMatchingChars(possibleChar, listOfChars):
     listOfMatchingChars = []  # this will be the return value
 
     for possibleMatchingChar in listOfChars:  # for each char in big list
-        if possibleMatchingChar == possibleChar:  # if the char we're attempting to find matches for is the exact
-            # same char as the char in the big list we are currently checking
+        if possibleMatchingChar == possibleChar:  # if the char we attempting to find matches for is the exact same
+            # char as the char in the big list we are currently checking
             # then we should not include it in the list of matches b/c that would end up double including the current
             # char
             continue  # so do not add to list of matches and jump back to top of for loop
@@ -390,7 +390,8 @@ def angleBetweenChars(firstChar, secondChar):
         # float division by zero will cause a crash in Python
         fltAngleInRad = math.atan(fltOpp / fltAdj)  # if adjacent is not zero, calculate angle
     else:
-        fltAngleInRad = 1.5708  # if adjacent is zero, use this as the angle, this is to be consistent with the C++ version of this program
+        fltAngleInRad = 1.5708  # if adjacent is zero, use this as the angle, this is to be consistent with the C++
+        # version of this program
     # end if
 
     fltAngleInDeg = fltAngleInRad * (180.0 / math.pi)  # calculate angle in degrees
@@ -400,10 +401,10 @@ def angleBetweenChars(firstChar, secondChar):
 
 # end function
 
-###################################################################################################
-# if we have two chars overlapping or to close to each other to possibly be separate chars, remove the inner (smaller) char,
-# this is to prevent including the same char twice if two contours are found for the same char,
-# for example for the letter 'O' both the inner ring and the outer ring may be found as contours, but we should only include the char once
+# ################################################################################################## if we have two
+# chars overlapping or to close to each other to possibly be separate chars, remove the inner (smaller) char,
+# this is to prevent including the same char twice if two contours are found for the same char, for example for the
+# letter 'O' both the inner ring and the outer ring may be found as contours, but we should only include the char once
 def removeInnerOverlappingChars(listOfMatchingChars):
     listOfMatchingCharsWithInnerCharRemoved = list(listOfMatchingChars)  # this will be the return value
 
@@ -413,9 +414,10 @@ def removeInnerOverlappingChars(listOfMatchingChars):
                 # if current char and other char have center points at almost the same location . . .
                 if distanceBetweenChars(currentChar, otherChar) < (
                         currentChar.fltDiagonalSize * MIN_DIAG_SIZE_MULTIPLE_AWAY):
-                    # if we get in here we have found overlapping chars
-                    # next we identify which char is smaller, then if that char was not already removed on a previous pass, remove it
-                    if currentChar.intBoundingRectArea < otherChar.intBoundingRectArea:  # if current char is smaller than other char
+                    # if we get in here we have found overlapping chars next we identify which char is smaller,
+                    # then if that char was not already removed on a previous pass, remove it
+                    if currentChar.intBoundingRectArea < otherChar.intBoundingRectArea:  # if current char is smaller
+                        # than other char
                         if currentChar in listOfMatchingCharsWithInnerCharRemoved:  # if current char was not already
                             # removed on a previous pass . . .
                             listOfMatchingCharsWithInnerCharRemoved.remove(currentChar)  # then remove current char
@@ -448,7 +450,7 @@ def recognizeCharsInPlate(imgThresh, listOfMatchingChars):
     listOfMatchingChars.sort(key=lambda matchingChar: matchingChar.intCenterX)  # sort chars from left to right
 
     cv2.cvtColor(imgThresh, cv2.COLOR_GRAY2BGR,
-                 imgThreshColor)  # make color version of threshold image, so we can draw contours in color on it
+                 imgThreshColor)  # make color version of threshold image so we can draw contours in color on it
 
     for currentChar in listOfMatchingChars:  # for each char in plate
         pt1 = (currentChar.intBoundingRectX, currentChar.intBoundingRectY)
@@ -463,7 +465,8 @@ def recognizeCharsInPlate(imgThresh, listOfMatchingChars):
                  currentChar.intBoundingRectX: currentChar.intBoundingRectX + currentChar.intBoundingRectWidth]
 
         imgROIResized = cv2.resize(imgROI, (
-        RESIZED_CHAR_IMAGE_WIDTH, RESIZED_CHAR_IMAGE_HEIGHT))  # resize image, this is necessary for char recognition
+            RESIZED_CHAR_IMAGE_WIDTH,
+            RESIZED_CHAR_IMAGE_HEIGHT))  # resize image, this is necessary for char recognition
 
         npaROIResized = imgROIResized.reshape(
             (1, RESIZED_CHAR_IMAGE_WIDTH * RESIZED_CHAR_IMAGE_HEIGHT))  # flatten image into 1d numpy array

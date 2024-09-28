@@ -3,6 +3,7 @@
 import cv2
 import numpy as np
 import os
+
 import DetectChars
 import DetectPlates
 import PossiblePlate
@@ -14,7 +15,7 @@ SCALAR_YELLOW = (0.0, 255.0, 255.0)
 SCALAR_GREEN = (0.0, 255.0, 0.0)
 SCALAR_RED = (0.0, 0.0, 255.0)
 
-showSteps = True
+showSteps = False
 
 
 ###################################################################################################
@@ -26,7 +27,7 @@ def main():
         return  # and exit program
     # end if
 
-    imgOriginalScene = cv2.imread("image/image3.jpg")  # open image
+    imgOriginalScene = cv2.imread("image/image11.jpg")  # open image
 
     if imgOriginalScene is None:  # if image was not read successfully
         print("\nerror: image not read from file \n\n")  # print error message to std out
@@ -48,8 +49,8 @@ def main():
         # sort the list of possible plates in DESCENDING order (most number of chars to least number of chars)
         listOfPossiblePlates.sort(key=lambda possiblePlate: len(possiblePlate.strChars), reverse=True)
 
-        # suppose the plate with the most recognized chars (the first plate in sorted by string length
-        # descending order) is the actual plate
+        # suppose the plate with the most recognized chars (the first plate in sorted by string length descending
+        # order) is the actual plate
         licPlate = listOfPossiblePlates[0]
 
         cv2.imshow("imgPlate", licPlate.imgPlate)  # show crop of plate and threshold of plate
@@ -60,7 +61,7 @@ def main():
             return  # and exit program
         # end if
 
-        drawRedRectangleAroundPlate(imgOriginalScene, licPlate)  # draw red rectangle around plate
+        # drawRedRectangleAroundPlate(imgOriginalScene, licPlate)             # draw red rectangle around plate
 
         print("\nlicense plate read from image = " + licPlate.strChars + "\n")  # write license plate text to std out
         print("----------------------------------------")
@@ -84,8 +85,8 @@ def main():
 def drawRedRectangleAroundPlate(imgOriginalScene, licPlate):
     p2fRectPoints = cv2.boxPoints(licPlate.rrLocationOfPlateInScene)  # get 4 vertices of rotated rect
 
-    cv2.line(imgOriginalScene, tuple(p2fRectPoints[0]), tuple(p2fRectPoints[1]), SCALAR_RED, 2)  # draw 4 red
-    # lines
+    # cv2.line(imgOriginalScene, tuple(p2fRectPoints[0]), tuple(p2fRectPoints[1]), SCALAR_RED, 2)         # draw 4
+    # red lines
     cv2.line(imgOriginalScene, tuple(p2fRectPoints[1]), tuple(p2fRectPoints[2]), SCALAR_RED, 2)
     cv2.line(imgOriginalScene, tuple(p2fRectPoints[2]), tuple(p2fRectPoints[3]), SCALAR_RED, 2)
     cv2.line(imgOriginalScene, tuple(p2fRectPoints[3]), tuple(p2fRectPoints[0]), SCALAR_RED, 2)
@@ -124,8 +125,8 @@ def writeLicensePlateCharsOnImage(imgOriginalScene, licPlate):
         ptCenterOfTextAreaY = int(round(intPlateCenterY)) + int(
             round(plateHeight * 1.6))  # write the chars in below the plate
     else:  # else if the license plate is in the lower 1/4 of the image
-        ptCenterOfTextAreaY = int(round(intPlateCenterY)) - int(round(plateHeight * 1.6))  # write the chars in
-        # above the plate
+        ptCenterOfTextAreaY = int(round(intPlateCenterY)) - int(
+            round(plateHeight * 1.6))  # write the chars in above the plate
     # end if
 
     textSizeWidth, textSizeHeight = textSize  # unpack text size width and height
