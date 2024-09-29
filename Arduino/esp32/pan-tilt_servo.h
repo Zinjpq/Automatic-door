@@ -21,25 +21,25 @@ extern int tiltAngle;
 void go_left(){
   panAngle = min(panAngle - stepSize, MIN_ANGLE);  
   panServo.write(panAngle);
-  Serial.println("pan",panAngle);
+  Serial.println("pan"+ panAngle);
 }
 
 void go_right(){
   panAngle = max(panAngle + stepSize, MAX_ANGLE);  
   panServo.write(panAngle);
-  Serial.println("pan", panAngle);
+  Serial.println("pan"+ panAngle);
 }
 
 void go_up(){
   tiltAngle = min(tiltAngle - stepSize, MIN_ANGLE);
   tiltServo.write(tiltAngle);
-  Serial.println("tilt",tiltAngle);
+  Serial.println("tilt"+tiltAngle);
 }
 
 void go_down(){
   tiltAngle = max(tiltAngle + stepSize, MAX_ANGLE);
   tiltServo.write(tiltAngle);
-  Serial.println("tilt", tiltAngle);
+  Serial.println("tilt"+ tiltAngle);
 }
 
 void setup_pantiltcam(){
