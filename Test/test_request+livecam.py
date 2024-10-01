@@ -7,11 +7,12 @@ import time
 import numpy as np
 
 # ESP32-CAM URL and Control URLs
-url_cam = 'http://192.168.3.56/cam'
-url1 = 'http://192.168.3.56/left'
-url2 = 'http://192.168.3.56/right'
-url3 = 'http://192.168.3.56/up'
-url4 = 'http://192.168.3.56/down'
+url_or = 'http://192.168.3.61'
+url_cam = url_or + '/cam'
+url1 = url_or + '/left'
+url2 = url_or + '/right'
+url3 = url_or + '/up'
+url4 = url_or + '/down'
 
 
 # Function to send control signals to ESP32

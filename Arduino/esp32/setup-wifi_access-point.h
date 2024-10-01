@@ -23,7 +23,13 @@ void loadWiFiCredentials(String &ssid, String &password) {
 
 // Hàm lưu thông tin Wi-Fi vào EEPROM
 void saveWiFiCredentials(String ssid, String password) {
-  EEPROM.begin(512); // Khởi tạo EEPROM với kích thước 512 byte
+  EEPROM.begin(512); // Khởi tạo EEPROM (kích thước tùy theo nhu cầu)
+  // Xóa dữ liệu cũ trong EEPROM
+  for (int i = 0; i < 100; ++i) {
+    EEPROM.write(i, 0);         // Xóa SSID cũ
+    EEPROM.write(100 + i, 0);   // Xóa Password cũ
+  }
+
   for (int i = 0; i < ssid.length(); ++i) {
     EEPROM.write(i, ssid[i]); // Lưu SSID vào EEPROM
   }
@@ -59,6 +65,11 @@ void handleSave() {
   Serial.println("SSID: " + ssid);
   Serial.println("Password: " + password);
 
+  if (ssid == "" || password == "") {
+    server.send(400, "text/html", "SSID hoặc mật khẩu không hợp lệ.");
+    return;
+  }
+
   // Thông báo cho người dùng
   String message = "<html><body><h1>Wi-Fi Information Saved!</h1><p>ESP32 will now restart.</p></body></html>";
   server.send(200, "text/html", message);
@@ -70,8 +81,10 @@ void handleSave() {
 void setup_access_point(){
   // Nếu không kết nối được, chuyển sang AP mode
   WiFi.softAP("ESP32-Access Point", "12345678");
-  Serial.println("Failed to connect. Access Point mode started");
-  Serial.println(WiFi.softAPIP());
+  // Serial.println("Failed to connect. Access Point mode started");
+  // Serial.println(WiFi.softAPIP());
+  WiFi.softAPIP();
+  analogWrite(4, (255*1/100));
 
   // Khởi động web server
   server.on("/", handleRoot); // Trang chủ
