@@ -79,7 +79,7 @@ void saveServoPositions(){
 }
 
 // Main loop function
-void loop()1{
+void loop(){
   checkRFID();
 
   if (RFIDval > 0) openDoor(RFIDval);

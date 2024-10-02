@@ -21,10 +21,11 @@ void setup() {
   Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
 
   EEPROM.begin(512); // Khởi tạo EEPROM (kích thước tùy theo nhu cầu)
-  if (!EEPROM.begin(512)) {
-    Serial.println("EEPROM initialization failed");
-    while (true); // Dừng chương trình nếu EEPROM không khởi tạo được
-  }
+  
+  // if (!EEPROM.begin(512)) {
+  //   Serial.println("EEPROM initialization failed");
+  //   while (true); // Dừng chương trình nếu EEPROM không khởi tạo được
+  // }
 
   setup_cam();
   
