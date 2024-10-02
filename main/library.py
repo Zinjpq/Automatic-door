@@ -4,6 +4,24 @@ import urllib.request
 import cv2
 import numpy as np
 import os
+import tkinter as tk
+import requests
+import cv2
+from PIL import Image, ImageTk
+import numpy as np
+import qrcode
+import threading
+import time
+import cv2
+import numpy as np
+import os
+import requests
+import cv2
+import tkinter as tk
+from tkinter import Label, Button
+from PIL import Image, ImageTk
+import time
+import numpy as np
 
 import DetectChars
 import DetectPlates
@@ -16,37 +34,14 @@ SCALAR_YELLOW = (0.0, 255.0, 255.0)
 SCALAR_GREEN = (0.0, 255.0, 0.0)
 SCALAR_RED = (0.0, 0.0, 255.0)
 
-showSteps = False
+# ESP32-CAM URL and Control URLs
+url_or = 'http://192.168.3.61'
 
-# Hàm kiểm tra biển số xe có hợp lệ không
-def check_plate(plate_text):
-    patterns = [
-        r'^\d{2}[A-Z]{1}\s\d{3}\d{2}$',  # Pattern cho định dạng 1
-        r'^\d{2}[A-Z]{1}\s\d{2,3}\d{2}$'  # Pattern cho định dạng 2
-    ]
-    return any(re.match(pattern, plate_text) for pattern in patterns)
-
-
-# cach dung cua ham tren
-# for plate_image in plate_images:
-#             plate_text = recognize_plate(plate_image)
-#             if plate_text and is_valid_plate(plate_text) and plate_text not in detected_plates:
-#                 detected_plates.append(plate_text)
-#                 print(f"Detected Plate: {plate_text} at {datetime.now()}")
-
-# Hàm đọc ảnh từ URL
-def read_url(url):
-    img_resp = urllib.request.urlopen(url)
-    imgnp = np.array(bytearray(img_resp.read()), dtype=np.uint8)
-    image = cv2.imdecode(imgnp, -1)
-    return image
-
-
-# Hàm lưu ảnh
-def save_image(image, file_path):
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    file_name = f"{timestamp}_{file_path}"
-    cv2.imwrite(file_name, image)
+url_cam = url_or + '/cam'
+url1 = url_or + '/left'
+url2 = url_or + '/right'
+url3 = url_or + '/up'
+url4 = url_or + '/down'
 
 def detect_plate(imgOriginalScene):
     blnKNNTrainingSuccessful = DetectChars.loadKNNDataAndTrainKNN()  # attempt KNN training
@@ -63,3 +58,10 @@ def detect_plate(imgOriginalScene):
     
     licPlate = listOfPossiblePlates[0]
     return licPlate.strChars
+
+def generate_qr(data):
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill='black', back_color='white')
+    return ImageTk.PhotoImage(img)

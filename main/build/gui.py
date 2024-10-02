@@ -61,7 +61,7 @@ button_1 = Button(
     relief="flat"
 )
 button_1.place(
-    x=52.0,
+    x=100.0,
     y=76.0,
     width=48.0,
     height=48.0
@@ -77,7 +77,7 @@ button_2 = Button(
     relief="flat"
 )
 button_2.place(
-    x=100.0,
+    x=148.0,
     y=76.0,
     width=48.0,
     height=48.0
@@ -93,9 +93,9 @@ button_3 = Button(
     relief="flat"
 )
 button_3.place(
-    x=148.0,
-    y=76.0,
-    width=48.0,
+    x=12.0,
+    y=136.0,
+    width=232.0,
     height=48.0
 )
 
@@ -110,7 +110,7 @@ button_4 = Button(
 )
 button_4.place(
     x=12.0,
-    y=136.0,
+    y=192.0,
     width=232.0,
     height=48.0
 )
@@ -126,7 +126,7 @@ button_5 = Button(
 )
 button_5.place(
     x=12.0,
-    y=192.0,
+    y=248.0,
     width=232.0,
     height=48.0
 )
@@ -142,7 +142,7 @@ button_6 = Button(
 )
 button_6.place(
     x=12.0,
-    y=248.0,
+    y=304.0,
     width=232.0,
     height=48.0
 )
@@ -157,22 +157,6 @@ button_7 = Button(
     relief="flat"
 )
 button_7.place(
-    x=12.0,
-    y=304.0,
-    width=232.0,
-    height=48.0
-)
-
-button_image_8 = PhotoImage(
-    file=relative_to_assets("button_8.png"))
-button_8 = Button(
-    image=button_image_8,
-    borderwidth=0,
-    highlightthickness=0,
-    command=lambda: print("button_8 clicked"),
-    relief="flat"
-)
-button_8.place(
     x=12.0,
     y=674.0,
     width=24.0,
@@ -239,6 +223,22 @@ image_5 = canvas.create_image(
     image=image_image_5
 )
 
+button_image_8 = PhotoImage(
+    file=relative_to_assets("button_8.png"))
+button_8 = Button(
+    image=button_image_8,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_8 clicked"),
+    relief="flat"
+)
+button_8.place(
+    x=983.0,
+    y=259.0,
+    width=72.0,
+    height=94.0
+)
+
 button_image_9 = PhotoImage(
     file=relative_to_assets("button_9.png"))
 button_9 = Button(
@@ -249,7 +249,7 @@ button_9 = Button(
     relief="flat"
 )
 button_9.place(
-    x=983.0,
+    x=1065.0,
     y=259.0,
     width=72.0,
     height=94.0
@@ -265,7 +265,7 @@ button_10 = Button(
     relief="flat"
 )
 button_10.place(
-    x=1065.0,
+    x=1147.0,
     y=259.0,
     width=72.0,
     height=94.0
@@ -281,8 +281,8 @@ button_11 = Button(
     relief="flat"
 )
 button_11.place(
-    x=1147.0,
-    y=259.0,
+    x=983.0,
+    y=353.0,
     width=72.0,
     height=94.0
 )
@@ -297,7 +297,7 @@ button_12 = Button(
     relief="flat"
 )
 button_12.place(
-    x=983.0,
+    x=1065.0,
     y=353.0,
     width=72.0,
     height=94.0
@@ -313,7 +313,7 @@ button_13 = Button(
     relief="flat"
 )
 button_13.place(
-    x=1065.0,
+    x=1147.0,
     y=353.0,
     width=72.0,
     height=94.0
@@ -329,8 +329,8 @@ button_14 = Button(
     relief="flat"
 )
 button_14.place(
-    x=1147.0,
-    y=353.0,
+    x=983.0,
+    y=447.0,
     width=72.0,
     height=94.0
 )
@@ -345,7 +345,7 @@ button_15 = Button(
     relief="flat"
 )
 button_15.place(
-    x=983.0,
+    x=1065.0,
     y=447.0,
     width=72.0,
     height=94.0
@@ -361,7 +361,7 @@ button_16 = Button(
     relief="flat"
 )
 button_16.place(
-    x=1065.0,
+    x=1147.0,
     y=447.0,
     width=72.0,
     height=94.0
@@ -377,22 +377,6 @@ button_17 = Button(
     relief="flat"
 )
 button_17.place(
-    x=1147.0,
-    y=447.0,
-    width=72.0,
-    height=94.0
-)
-
-button_image_18 = PhotoImage(
-    file=relative_to_assets("button_18.png"))
-button_18 = Button(
-    image=button_image_18,
-    borderwidth=0,
-    highlightthickness=0,
-    command=lambda: print("button_18 clicked"),
-    relief="flat"
-)
-button_18.place(
     x=864.0,
     y=576.0,
     width=24.0,
