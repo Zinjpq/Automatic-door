@@ -21,11 +21,6 @@ void setup() {
   Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
 
   EEPROM.begin(512); // Khởi tạo EEPROM (kích thước tùy theo nhu cầu)
-  
-  // if (!EEPROM.begin(512)) {
-  //   Serial.println("EEPROM initialization failed");
-  //   while (true); // Dừng chương trình nếu EEPROM không khởi tạo được
-  // }
 
   setup_cam();
   
@@ -47,8 +42,8 @@ void setup() {
     }
 
     if (WiFi.status() == WL_CONNECTED) {
-      Serial.println("Đã kết nối tới Wi-Fi");
-      Serial.print("Địa chỉ IP: ");
+      // Serial.println("Đã kết nối tới Wi-Fi");
+      // Serial.print("Địa chỉ IP: ");
       Serial.println(WiFi.localIP());
 
       // Thiết lập thời gian, camera và các servo pan-tilt

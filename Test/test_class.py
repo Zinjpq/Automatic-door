@@ -101,8 +101,6 @@ class ESP32CamApp:
                 self.status_label_1.config(text="Chưa kết nối được với ESP32-CAM...")
             time.sleep(2)
 
-    # Generate QR Code
-
     # Send control commands to ESP32-CAM
     def send_command(self, url):
         try:

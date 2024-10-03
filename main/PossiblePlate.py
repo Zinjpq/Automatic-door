@@ -1,5 +1,8 @@
 # PossiblePlate.py
 
+import cv2
+import numpy as np
+
 ###################################################################################################
 class PossiblePlate:
 
@@ -15,3 +18,7 @@ class PossiblePlate:
     # end constructor
 
 # end class
+
+
+
+

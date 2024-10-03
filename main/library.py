@@ -1,38 +1,15 @@
-import re
-import time
-import urllib.request
-import cv2
-import numpy as np
-import os
-import tkinter as tk
-import requests
-import cv2
-from PIL import Image, ImageTk
-import numpy as np
-import qrcode
 import threading
 import time
-import cv2
-import numpy as np
-import os
-import requests
-import cv2
 import tkinter as tk
-from tkinter import Label, Button
-from PIL import Image, ImageTk
-import time
+
+import cv2
 import numpy as np
+import qrcode
+import requests
+from PIL import Image, ImageTk
 
 import DetectChars
 import DetectPlates
-import PossiblePlate
-
-# module level variables ##########################################################################
-SCALAR_BLACK = (0.0, 0.0, 0.0)
-SCALAR_WHITE = (255.0, 255.0, 255.0)
-SCALAR_YELLOW = (0.0, 255.0, 255.0)
-SCALAR_GREEN = (0.0, 255.0, 0.0)
-SCALAR_RED = (0.0, 0.0, 255.0)
 
 # ESP32-CAM URL and Control URLs
 url_or = 'http://192.168.3.61'
@@ -43,10 +20,24 @@ url2 = url_or + '/right'
 url3 = url_or + '/up'
 url4 = url_or + '/down'
 
+
+def detect_license_plate(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    plate_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_russian_plate_number.xml')
+    plates = plate_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    plate_images = []
+    for (x, y, w, h) in plates:
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        plate_images.append(gray[y:y + h, x:x + w])
+
+    return image, plate_images
+
+
 def detect_plate(imgOriginalScene):
     blnKNNTrainingSuccessful = DetectChars.loadKNNDataAndTrainKNN()  # attempt KNN training
 
-    if blnKNNTrainingSuccessful == False:  # if KNN training was not successful
+    if not blnKNNTrainingSuccessful:  # if KNN training was not successful
         print("\nerror: KNN traning was not successful\n")  # show error message
         return  # and exit program
     # end if
@@ -55,9 +46,10 @@ def detect_plate(imgOriginalScene):
     listOfPossiblePlates = DetectChars.detectCharsInPlates(listOfPossiblePlates)  # detect chars in plates
 
     listOfPossiblePlates.sort(key=lambda possiblePlate: len(possiblePlate.strChars), reverse=True)
-    
+
     licPlate = listOfPossiblePlates[0]
     return licPlate.strChars
+
 
 def generate_qr(data):
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
@@ -65,6 +57,7 @@ def generate_qr(data):
     qr.make(fit=True)
     img = qr.make_image(fill='black', back_color='white')
     return ImageTk.PhotoImage(img)
+
 
 class ESP32CamApp:
     def __init__(self, root):
@@ -76,11 +69,12 @@ class ESP32CamApp:
         self.root.geometry("1280x720")
 
         # ESP32-CAM URLs
-        self.url_cam = 'http://192.168.1.100/cam'
-        self.url1 = 'http://192.168.1.100/left'
-        self.url2 = 'http://192.168.1.100/right'
-        self.url3 = 'http://192.168.1.100/up'
-        self.url4 = 'http://192.168.1.100/down'
+        self.url_Original = 'http://192.168.1.100'
+        self.url_cam = self.url_Original + '/cam'
+        self.url1 = self.url_Original + '/left'
+        self.url2 = self.url_Original + '/right'
+        self.url3 = self.url_Original + '/up'
+        self.url4 = self.url_Original + '/down'
 
         # Initialize scenes
         self.scene_1_frame = tk.Frame(self.root)
@@ -142,7 +136,7 @@ class ESP32CamApp:
     def check_connection(self):
         while True:
             try:
-                response = requests.get('http://192.168.1.100', timeout=1)
+                response = requests.get(url_or, timeout=1)
                 if response.status_code == 200:
                     self.status_label_1.config(text="Kết nối thành công với ESP32-CAM!")
                     self.switch_to_scene_2()
@@ -179,3 +173,12 @@ class ESP32CamApp:
             self.status_label_2.config(text=f"Video stream error: {e}")
         self.root.after(30, self.update_video)
 
+    def anpr(self):
+        while True:
+            try:
+                imgOriginalScene = requests.get(self.url_cam)
+                listOfPossiblePlates = DetectPlates.detectPlatesInScene(imgOriginalScene)  # detect plates
+                DetectChars.detectCharsInPlates(listOfPossiblePlates)
+
+            except Exception as e:
+                print(f"Error: {e}")
