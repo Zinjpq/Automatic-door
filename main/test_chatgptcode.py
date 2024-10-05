@@ -3,7 +3,7 @@ import numpy as np
 import pytesseract
 
 
-# Hàm nhận diện biển số xe từ ảnh
+# Hàm phát hiện biển số từ ảnh
 def detect_license_plate(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     plate_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_russian_plate_number.xml')
@@ -11,47 +11,60 @@ def detect_license_plate(image):
 
     plate_images = []
     for (x, y, w, h) in plates:
-        # Vẽ khung xung quanh biển số phát hiện
+        # Vẽ khung xung quanh biển số
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        # Cắt ảnh chứa biển số
+        # Cắt vùng ảnh chứa biển số
         plate_images.append(gray[y:y + h, x:x + w])
 
     return image, plate_images
 
 
-# Hàm xử lý ngưỡng cho ảnh
+# Hàm tiền xử lý ảnh biển số (ngưỡng và Gaussian blur)
 def preprocess_plate(plate_image):
-    # Áp dụng GaussianBlur để giảm nhiễu
+    # Giảm nhiễu với GaussianBlur
     imgBlurred = cv2.GaussianBlur(plate_image, (5, 5), 0)
-    # Áp dụng ngưỡng (threshold) để tạo ảnh đen trắng
+    # Áp dụng ngưỡng để có ảnh nhị phân (binary)
     _, imgThresh = cv2.threshold(imgBlurred, 150, 255, cv2.THRESH_BINARY_INV)
     return imgThresh
 
 
-# Hàm nhận diện ký tự từ ảnh biển số
+# Hàm tìm và lọc các contour ký tự từ biển số
+def find_contours_of_chars(imgThresh):
+    contours, _ = cv2.findContours(imgThresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    listOfMatchingChars = []
+
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
+
+        # Lọc kích thước hợp lý của ký tự (giả định ký tự có tỷ lệ chiều cao và chiều rộng hợp lý)
+        if w > 5 and h > 15 and h / w > 1.5 and h / w < 7:  # Bạn có thể điều chỉnh giá trị này
+            matchingChar = {
+                'intBoundingRectX': x,
+                'intBoundingRectY': y,
+                'intBoundingRectWidth': w,
+                'intBoundingRectHeight': h,
+                'intCenterX': x + (w // 2),
+                'intCenterY': y + (h // 2)
+            }
+            listOfMatchingChars.append(matchingChar)
+
+    return listOfMatchingChars
+
+
+# Hàm nhận diện ký tự từ biển số
 def recognizeCharsInPlate(imgThresh, listOfMatchingChars):
-    strChars = ""  # Chuỗi trả về các ký tự nhận diện được trong biển số
+    strChars = ""  # Chuỗi trả về các ký tự nhận diện được
 
-    height, width = imgThresh.shape
-    imgThreshColor = np.zeros((height, width, 3), np.uint8)  # Ảnh màu
+    # Sắp xếp ký tự từ trái sang phải
+    listOfMatchingChars.sort(key=lambda char: char['intCenterX'])
 
-    listOfMatchingChars.sort(key=lambda matchingChar: matchingChar.intCenterX)  # Sắp xếp ký tự từ trái sang phải
-
-    cv2.cvtColor(imgThresh, cv2.COLOR_GRAY2BGR, imgThreshColor)  # Chuyển ảnh sang màu
-
-    # Duyệt qua từng ký tự trong biển số
     for currentChar in listOfMatchingChars:
-        pt1 = (currentChar.intBoundingRectX, currentChar.intBoundingRectY)
-        pt2 = (currentChar.intBoundingRectX + currentChar.intBoundingRectWidth,
-               currentChar.intBoundingRectY + currentChar.intBoundingRectHeight)
-
-        # Vẽ khung xanh quanh ký tự
-        cv2.rectangle(imgThreshColor, pt1, pt2, (0, 255, 0), 2)
+        # Lấy tọa độ của ký tự
+        x, y, w, h = currentChar['intBoundingRectX'], currentChar['intBoundingRectY'], currentChar[
+            'intBoundingRectWidth'], currentChar['intBoundingRectHeight']
 
         # Cắt phần ảnh chứa ký tự
-        imgROI = imgThresh[
-                 currentChar.intBoundingRectY: currentChar.intBoundingRectY + currentChar.intBoundingRectHeight,
-                 currentChar.intBoundingRectX: currentChar.intBoundingRectX + currentChar.intBoundingRectWidth]
+        imgROI = imgThresh[y:y + h, x:x + w]
 
         # Nhận diện ký tự bằng Tesseract OCR
         config = '--psm 10 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -71,10 +84,11 @@ def process_image_for_plate_recognition(image):
     for plate_image in plate_images:
         # Tiền xử lý ảnh biển số
         imgThresh = preprocess_plate(plate_image)
-        # Giả sử bạn đã có danh sách các ký tự tìm được trong biển số (ví dụ: từ kết quả contour detection)
-        listOfMatchingChars = []  # Phần này bạn cần tùy chỉnh dựa trên thuật toán tìm contour của bạn
 
-        # Bước 3: Nhận diện ký tự trong biển số
+        # Bước 3: Tìm các contour ký tự
+        listOfMatchingChars = find_contours_of_chars(imgThresh)
+
+        # Bước 4: Nhận diện ký tự trong biển số
         plate_text = recognizeCharsInPlate(imgThresh, listOfMatchingChars)
         print("Ký tự biển số:", plate_text)
 
@@ -83,7 +97,6 @@ def process_image_for_plate_recognition(image):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-
 # Giả sử ảnh đầu vào
-image = cv2.imread('image/image2.jpg')
+image = cv2.imread('image/image7.jpg')
 process_image_for_plate_recognition(image)
