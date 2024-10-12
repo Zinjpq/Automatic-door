@@ -90,8 +90,7 @@ def detectCharsInPlates(listOfPossiblePlates):
 
     for possiblePlate in listOfPossiblePlates:  # for each possible plate, this is a big for loop that takes up most of the function
 
-        possiblePlate.imgGrayscale, possiblePlate.imgThresh = Preprocess.preprocess(
-            possiblePlate.imgPlate)  # preprocess to get grayscale and threshold images
+        possiblePlate.imgGrayscale, possiblePlate.imgThresh = Preprocess.preprocess(possiblePlate.imgPlate)  # preprocess to get grayscale and threshold images
 
         if Main.showSteps == True:  # show steps ###################################################
             cv2.imshow("5a", possiblePlate.imgPlate)
