@@ -18,6 +18,7 @@ showSteps = False
 
 ###################################################################################################
 def main():
+    blnKNNTrainingSuccessful = DetectChars.loadKNNDataAndTrainKNN()         # attempt KNN training
     cap = cv2.VideoCapture(0)  # Mở camera mặc định của laptop
     cv2.namedWindow("detection", cv2.WINDOW_AUTOSIZE)
 
@@ -26,26 +27,20 @@ def main():
         if not ret:
             break
         cv2.imshow('detection', imgOriginalScene)
-        listOfPossiblePlates = DetectPlates.detectPlatesInScene(imgOriginalScene)           # detect plates
+
+        listOfPossiblePlates, imgGrayscaleScene, imgThreshScene = DetectPlates.detectPlatesInScene(imgOriginalScene)           # detect plates
+
+        cv2.imshow("1a", imgGrayscaleScene)
+        cv2.imshow("1b", imgThreshScene)
 
         listOfPossiblePlates = DetectChars.detectCharsInPlates(listOfPossiblePlates)        # detect chars in plates
 
-        listOfPossiblePlates.sort(key = lambda possiblePlate: len(possiblePlate.strChars), reverse = True)
+        if len(listOfPossiblePlates) != 0:
+            listOfPossiblePlates.sort(key=lambda possiblePlate: len(possiblePlate.strChars), reverse=True)
+            # suppose the plate with the most recognized chars (the first plate in sorted by string length descending order) is the actual plate
+            licPlate = listOfPossiblePlates[0]
 
-                # suppose the plate with the most recognized chars (the first plate in sorted by string length descending order) is the actual plate
-        licPlate = listOfPossiblePlates[0]
-
-        cv2.imshow("imgPlate", licPlate.imgPlate)           # show crop of plate and threshold of plate
-        cv2.imshow("imgThresh", licPlate.imgThresh)
-
-        print("\nlicense plate read from image = " + licPlate.strChars + "\n")  # write license plate text to std out
-        print("----------------------------------------")
-
-        cv2.imshow("imgOriginalScene", imgOriginalScene)                # re-show scene image
-
-        cv2.imwrite("imgOriginalScene.png", imgOriginalScene)           # write image out to file
-
-
+            print(licPlate.strChars)
 
 
         key = cv2.waitKey(5)

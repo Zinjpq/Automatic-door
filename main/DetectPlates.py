@@ -43,7 +43,7 @@ def detectPlatesInScene(imgOriginalScene):
         # end if
     # end for
     
-    return listOfPossiblePlates
+    return listOfPossiblePlates, imgGrayscaleScene, imgThreshScene
 # end function
 
 ###################################################################################################
