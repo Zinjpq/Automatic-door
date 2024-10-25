@@ -3,7 +3,6 @@
 import cv2
 import numpy as np
 import math
-import Main
 import random
 
 import Preprocess
@@ -60,11 +59,6 @@ def findPossibleCharsInScene(imgThresh):
     imgContours = np.zeros((height, width, 3), np.uint8)
 
     for i in range(0, len(contours)):                       # for each contour
-
-        if Main.showSteps == True: # show steps ###################################################
-            cv2.drawContours(imgContours, contours, i, Main.SCALAR_WHITE)
-        # end if # show steps #####################################################################
-
         possibleChar = PossibleChar.PossibleChar(contours[i])
 
         if DetectChars.checkIfPossibleChar(possibleChar):                   # if contour is a possible char, note this does not compare to other chars (yet) . . .
@@ -72,13 +66,6 @@ def findPossibleCharsInScene(imgThresh):
             listOfPossibleChars.append(possibleChar)                        # and add to list of possible chars
         # end if
     # end for
-
-    if Main.showSteps == True: # show steps #######################################################
-        print("\nstep 2 - len(contours) = " + str(len(contours)))  # 2362 with MCLRNF1 image
-        print("step 2 - intCountOfPossibleChars = " + str(intCountOfPossibleChars))  # 131 with MCLRNF1 image
-        cv2.imshow("2a", imgContours)
-    # end if # show steps #########################################################################
-
     return listOfPossibleChars
 # end function
 
