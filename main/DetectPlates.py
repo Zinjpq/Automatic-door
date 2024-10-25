@@ -25,65 +25,15 @@ def detectPlatesInScene(imgOriginalScene):
     imgThreshScene = np.zeros((height, width, 1), np.uint8)
     imgContours = np.zeros((height, width, 3), np.uint8)
 
-    cv2.destroyAllWindows()
-
-    if Main.showSteps == True: # show steps #######################################################
-        cv2.imshow("0", imgOriginalScene)
-    # end if # show steps #########################################################################
-
     imgGrayscaleScene, imgThreshScene = Preprocess.preprocess(imgOriginalScene)         # preprocess to get grayscale and threshold images
-
-    if Main.showSteps == True: # show steps #######################################################
-        cv2.imshow("1a", imgGrayscaleScene)
-        cv2.imshow("1b", imgThreshScene)
-    # end if # show steps #########################################################################
 
             # find all possible chars in the scene,
             # this function first finds all contours, then only includes contours that could be chars (without comparison to other chars yet)
     listOfPossibleCharsInScene = findPossibleCharsInScene(imgThreshScene)
 
-    if Main.showSteps == True: # show steps #######################################################
-        print("step 2 - len(listOfPossibleCharsInScene) = " + str(
-            len(listOfPossibleCharsInScene)))  # 131 with MCLRNF1 image
-
-        imgContours = np.zeros((height, width, 3), np.uint8)
-
-        contours = []
-
-        for possibleChar in listOfPossibleCharsInScene:
-            contours.append(possibleChar.contour)
-        # end for
-
-        cv2.drawContours(imgContours, contours, -1, Main.SCALAR_WHITE)
-        cv2.imshow("2b", imgContours)
-    # end if # show steps #########################################################################
-
             # given a list of all possible chars, find groups of matching chars
             # in the next steps each group of matching chars will attempt to be recognized as a plate
     listOfListsOfMatchingCharsInScene = DetectChars.findListOfListsOfMatchingChars(listOfPossibleCharsInScene)
-
-    if Main.showSteps == True: # show steps #######################################################
-        print("step 3 - listOfListsOfMatchingCharsInScene.Count = " + str(
-            len(listOfListsOfMatchingCharsInScene)))  # 13 with MCLRNF1 image
-
-        imgContours = np.zeros((height, width, 3), np.uint8)
-
-        for listOfMatchingChars in listOfListsOfMatchingCharsInScene:
-            intRandomBlue = random.randint(0, 255)
-            intRandomGreen = random.randint(0, 255)
-            intRandomRed = random.randint(0, 255)
-
-            contours = []
-
-            for matchingChar in listOfMatchingChars:
-                contours.append(matchingChar.contour)
-            # end for
-
-            cv2.drawContours(imgContours, contours, -1, (intRandomBlue, intRandomGreen, intRandomRed))
-        # end for
-
-        cv2.imshow("3", imgContours)
-    # end if # show steps #########################################################################
 
     for listOfMatchingChars in listOfListsOfMatchingCharsInScene:                   # for each group of matching chars
         possiblePlate = extractPlate(imgOriginalScene, listOfMatchingChars)         # attempt to extract plate
@@ -92,33 +42,7 @@ def detectPlatesInScene(imgOriginalScene):
             listOfPossiblePlates.append(possiblePlate)                  # add to list of possible plates
         # end if
     # end for
-
-    print("\n" + str(len(listOfPossiblePlates)) + " possible plates found")  # 13 with MCLRNF1 image
-
-    if Main.showSteps == True: # show steps #######################################################
-        print("\n")
-        cv2.imshow("4a", imgContours)
-
-        for i in range(0, len(listOfPossiblePlates)):
-            p2fRectPoints = cv2.boxPoints(listOfPossiblePlates[i].rrLocationOfPlateInScene)
-
-            cv2.line(imgContours, tuple(p2fRectPoints[0]), tuple(p2fRectPoints[1]), Main.SCALAR_RED, 2)
-            cv2.line(imgContours, tuple(p2fRectPoints[1]), tuple(p2fRectPoints[2]), Main.SCALAR_RED, 2)
-            cv2.line(imgContours, tuple(p2fRectPoints[2]), tuple(p2fRectPoints[3]), Main.SCALAR_RED, 2)
-            cv2.line(imgContours, tuple(p2fRectPoints[3]), tuple(p2fRectPoints[0]), Main.SCALAR_RED, 2)
-
-            cv2.imshow("4a", imgContours)
-
-            print("possible plate " + str(i) + ", click on any image and press a key to continue . . .")
-
-            cv2.imshow("4b", listOfPossiblePlates[i].imgPlate)
-            cv2.waitKey(0)
-        # end for
-
-        print("\nplate detection complete, click on any image and press a key to begin char recognition . . .\n")
-        cv2.waitKey(0)
-    # end if # show steps #########################################################################
-
+    
     return listOfPossiblePlates
 # end function
 

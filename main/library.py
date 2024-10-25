@@ -15,3 +15,11 @@ def detect_license_plate(image):
 
     return image, plate_images
 
+
+# urlOriginal = 'http://192.168.1.100'
+# url_cam = urlOriginal + '/cam'
+
+# url_up = urlOriginal + '/up'
+# url_down = urlOriginal + '/down'
+# url_left = urlOriginal + '/left'
+# url_right = urlOriginal + '/right'

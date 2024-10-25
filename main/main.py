@@ -5,6 +5,7 @@ import cv2
 import Preprocess
 import DetectChars
 import library
+import DetectPlates
 
 # module level variables ##########################################################################
 SCALAR_BLACK = (0.0, 0.0, 0.0)
@@ -15,39 +16,45 @@ SCALAR_RED = (0.0, 0.0, 255.0)
 
 showSteps = False
 
-urlOriginal = 'http://192.168.1.100'
-url_cam = urlOriginal + '/cam'
-
-url_up = urlOriginal + '/up'
-url_down = urlOriginal + '/down'
-url_left = urlOriginal + '/left'
-url_right = urlOriginal + '/right'
-
-
 ###################################################################################################
 def main():
-    blnKNNTrainingSuccessful = DetectChars.loadKNNDataAndTrainKNN()
+    cap = cv2.VideoCapture(0)  # Mở camera mặc định của laptop
+    cv2.namedWindow("detection", cv2.WINDOW_AUTOSIZE)
 
-    if not blnKNNTrainingSuccessful:
-        print("\nerror: KNN traning was not successful\n")
-        return
-    # end if
+    while True:
+        ret, imgOriginalScene = cap.read()  # Đọc frame từ camera
+        if not ret:
+            break
+        cv2.imshow('detection', imgOriginalScene)
+        listOfPossiblePlates = DetectPlates.detectPlatesInScene(imgOriginalScene)           # detect plates
+
+        listOfPossiblePlates = DetectChars.detectCharsInPlates(listOfPossiblePlates)        # detect chars in plates
+
+        listOfPossiblePlates.sort(key = lambda possiblePlate: len(possiblePlate.strChars), reverse = True)
+
+                # suppose the plate with the most recognized chars (the first plate in sorted by string length descending order) is the actual plate
+        licPlate = listOfPossiblePlates[0]
+
+        cv2.imshow("imgPlate", licPlate.imgPlate)           # show crop of plate and threshold of plate
+        cv2.imshow("imgThresh", licPlate.imgThresh)
+
+        print("\nlicense plate read from image = " + licPlate.strChars + "\n")  # write license plate text to std out
+        print("----------------------------------------")
+
+        cv2.imshow("imgOriginalScene", imgOriginalScene)                # re-show scene image
+
+        cv2.imwrite("imgOriginalScene.png", imgOriginalScene)           # write image out to file
+
+
+
+
+        key = cv2.waitKey(5)
+        if key == ord('q'):  # Nhấn phím 'q' để thoát
+            break
+
+
+    cap.release()
     cv2.destroyAllWindows()
-
-    imgOriginalScene = cv2.imread("image/image7.jpg")
-    cv2.imshow("0", imgOriginalScene)
-
-    imgDetected, plate_images = library.detect_license_plate(imgOriginalScene)
-
-    for plate_image in plate_images:
-        imgGrayscale, imgThresh = Preprocess.preprocess(imgOriginalScene)
-        cv2.imshow("1a", imgGrayscale)
-        cv2.imshow("1b", imgThresh)
-
-
-
-    cv2.waitKey(0)					# hold windows open until user presses a key
-    return
 # end function
 
 ###################################################################################################
