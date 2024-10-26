@@ -1,7 +1,5 @@
 from pathlib import Path
-
-# from tkinter import *
-# Explicit imports to satisfy Flake8
+from tkinter import Tk, Canvas, Button, PhotoImage, Frame, Label
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"D:\1.Projects\Automatic-door\main\assets")
@@ -11,183 +9,84 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 
-import tkinter as tk
-from tkinter import Canvas, PhotoImage
+def on_button_1_clicked():
+    print("button_1 clicked")
 
 
-class Sidebar(tk.Frame):
-    def __init__(self, parent, switch_frame_callback):
-        super().__init__(parent, bg="lightgray")
-        self.pack(side="left", fill="y")
-
-        # Buttons to switch between frames
-        btn_frame1 = tk.Button(self, text="Giao diện 1", command=lambda: switch_frame_callback("frame1"))
-        btn_frame2 = tk.Button(self, text="Giao diện 2", command=lambda: switch_frame_callback("frame2"))
-
-        btn_frame1.pack(pady=10)
-        btn_frame2.pack(pady=10)
+def on_button_2_clicked():
+    print("button_2 clicked")
 
 
-class App(tk.Tk):
-    def __init__(self):
-        super().__init__()
-
-        self.geometry("1280x720")
-        self.configure(bg="#F2F4F8")
-
-        canvas = Canvas(
-            self,
-            bg="#F2F4F8",
-            height=720,
-            width=1280,
-            bd=0,
-            highlightthickness=0,
-            relief="ridge"
-        )
-        canvas.place(x=0, y=0)
-        image_image_1 = PhotoImage(file=relative_to_assets("image_sidebar.png"))
-        canvas.create_image(128.0, 360.0, image=image_image_1)
-
-        image_image_2 = PhotoImage(
-            file=relative_to_assets("image_logo.png"))
-        image_2 = canvas.create_image(
-            128.0,
-            44.0,
-            image=image_image_2
-        )
-        # Create Sidebar and main frames
-        self.sidebar = Sidebar(self, self.switch_frame)
-
-        # Create frames for each UI
-        self.frames = {}
-        for F in (Frame1, Frame2):
-            frame = F(self)
-            self.frames[F.__name__.lower()] = frame
-            frame.pack(fill="both", expand=True)
-
-        self.current_frame = None
-        self.switch_frame("frame1")  # Default to show frame1
-
-    def switch_frame(self, frame_name):
-        if self.current_frame:
-            self.current_frame.pack_forget()
-
-        frame = self.frames[frame_name]
-        frame.pack(fill="both", expand=True)
-        self.current_frame = frame
+def on_button_7_clicked():
+    print("button_7 clicked")
 
 
-class Frame1(tk.Frame):
-    def __init__(self, parent):
-        super().__init__(parent, bg="white")
-        tk.Label(self, text="Đây là Giao diện 1", font=("Arial", 18)).pack(pady=50)
+class Sidebar(Frame):
+    def __init__(self, parent, switch_screen_callback):
+        super().__init__(parent, bg="#F2F4F8")
+        self.switch_screen_callback = switch_screen_callback
+        self.configure(width=256, height=720)
+
+        # Add an image to the sidebar (e.g., a logo or icon)
+        self.add_sidebar_image("image_sidebar.png", x=-1, y=-1)
+        self.add_sidebar_image("image_logo.png", x=12, y=24)
+
+        # Sidebar buttons
+        self.create_button("button_alarm.png", on_button_1_clicked, x=100, y=76, width=48, height=48)
+
+        # Interface-switching buttons (button 3, 4, 5, and 6)
+        self.create_button("button_home.png", lambda: self.switch_screen_callback(3), x=12, y=136, width=232, height=48)
+        self.create_button("button_plate archive.png", lambda: self.switch_screen_callback(4), x=12, y=192, width=232, height=48)
+        self.create_button("button_camcontrol.png", lambda: self.switch_screen_callback(5), x=12, y=248, width=232, height=48)
+        self.create_button("button_setting.png", lambda: self.switch_screen_callback(6), x=12, y=304, width=232, height=48)
+
+        # Extra button (button 7)
+        self.create_button("button_....png", on_button_7_clicked, x=12, y=674, width=24, height=24)
+
+    def create_button(self, image_path, command, x, y, width, height):
+        button_image = PhotoImage(file=relative_to_assets(image_path))
+        button = Button(self, image=button_image, borderwidth=0, highlightthickness=0, relief="flat", command=command)
+        button.image = button_image  # Keep a reference to avoid garbage collection
+        button.place(x=x, y=y, width=width, height=height)
+
+    def add_sidebar_image(self, image_name, x, y):
+        """Add a static image to the sidebar."""
+        image = PhotoImage(file=relative_to_assets(image_name))
+        label = Label(self, image=image, bg="#F2F4F8")
+        label.image = image  # Keep reference to prevent garbage collection
+        label.place(x=x, y=y)
 
 
-class Frame2(tk.Frame):
-    def __init__(self, parent):
-        super().__init__(parent, bg="white")
-        tk.Label(self, text="Đây là Giao diện 2", font=("Arial", 18)).pack(pady=50)
+def switch_screen(screen_id):
+    print(f"Switching to screen {screen_id}")
+    # Placeholder for actual screen-switching logic
+
+
+class MainWindow:
+    def __init__(self, root):
+        self.root = root
+        self.root.geometry("1280x720")
+        self.root.configure(bg="#F2F4F8")
+        self.root.resizable(False, False)
+
+        # Canvas setup
+        self.canvas = Canvas(root, bg="#F2F4F8", height=720, width=1280, bd=0, highlightthickness=0, relief="ridge")
+        self.canvas.place(x=0, y=0)
+
+        # # Adding images to canvas
+        # self.image_image_1 = PhotoImage(file=relative_to_assets("image_1.png"))
+        # self.canvas.create_image(128, 360, image=self.image_image_1)
+        #
+        # self.image_image_2 = PhotoImage(file=relative_to_assets("image_2.png"))
+        # self.canvas.create_image(128, 44, image=self.image_image_2)
+
+        # Initialize sidebar with default screen set to 3
+        self.sidebar = Sidebar(self.root, switch_screen)
+        self.sidebar.place(x=0, y=0)
+        switch_screen(3)
 
 
 if __name__ == "__main__":
-    app = App()
-    app.mainloop()
-
-
-# from pathlib import Path
-#
-# # from tkinter import *
-# # Explicit imports to satisfy Flake8
-#
-#
-# OUTPUT_PATH = Path(__file__).parent
-# ASSETS_PATH = OUTPUT_PATH / Path(r"D:\1.Projects\Automatic-door\main\assets")
-#
-#
-# def relative_to_assets(path: str) -> Path:
-#     return ASSETS_PATH / Path(path)
-#
-#
-# import tkinter as tk
-# from tkinter import Tk, Canvas, PhotoImage
-#
-#
-#
-# class Sidebar(tk.Frame):
-#     def __init__(self, parent, switch_frame_callback):
-#         super().__init__(parent, bg="lightgray")
-#         self.pack(side="left", fill="y")
-#
-#         # Button để chuyển giao diện
-#         btn_frame1 = tk.Button(self, text="Giao diện 1", command=lambda: switch_frame_callback("frame1"))
-#         btn_frame2 = tk.Button(self, text="Giao diện 2", command=lambda: switch_frame_callback("frame2"))
-#
-#         btn_frame1.pack(pady=10)
-#         btn_frame2.pack(pady=10)
-#
-#
-# class App(tk.Tk):
-#     def __init__(self):
-#         super().__init__()
-#
-#         window = Tk()
-#
-#         window.geometry("1280x720")
-#         window.configure(bg="#F2F4F8")
-#
-#         canvas = Canvas(
-#             window,
-#             bg="#F2F4F8",
-#             height=720,
-#             width=1280,
-#             bd=0,
-#             highlightthickness=0,
-#             relief="ridge"
-#         )
-#
-#         canvas.place(x=0, y=0)
-#         image_image_1 = PhotoImage(
-#             file=relative_to_assets("image_sidebar.png"))
-#         image_sidebar = canvas.create_image(
-#             128.0,
-#             360.0,
-#             image=image_image_1
-#         )
-#
-#         # Tạo Sidebar và Frame chính
-#         self.sidebar = Sidebar(self, self.switch_frame)
-#
-#         # Tạo Frame cho các giao diện
-#         self.frames = {}
-#         for F in (Frame1, Frame2):
-#             frame = F(self)
-#             self.frames[F.__name__.lower()] = frame
-#             frame.pack(fill="both", expand=True)
-#
-#         self.current_frame = None
-#         self.switch_frame("frame1")  # Mặc định hiển thị giao diện 1
-#
-#     def switch_frame(self, frame_name):
-#         if self.current_frame:
-#             self.current_frame.pack_forget()
-#
-#         frame = self.frames[frame_name]
-#         frame.pack(fill="both", expand=True)
-#         self.current_frame = frame
-#
-#
-# class Frame1(tk.Frame):
-#     def __init__(self, parent):
-#         super().__init__(parent, bg="white")
-#         tk.Label(self, text="Đây là Giao diện 1", font=("Arial", 18)).pack(pady=50)
-#
-#
-# class Frame2(tk.Frame):
-#     def __init__(self, parent):
-#         super().__init__(parent, bg="white")
-#         tk.Label(self, text="Đây là Giao diện 2", font=("Arial", 18)).pack(pady=50)
-#
-#
-# if __name__ == "__main__":
-#     app = App()
-#     app.mainloop()
+    root = Tk()
+    app = MainWindow(root)
+    root.mainloop()
