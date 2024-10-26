@@ -11,7 +11,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"D:\1.Projects\Automatic door\main\build\assets\frame1")
+ASSETS_PATH = OUTPUT_PATH / Path(r"D:\1.Projects\Automatic-door\main\build\assets\frame1")
 
 
 def relative_to_assets(path: str) -> Path:
@@ -35,72 +35,20 @@ canvas = Canvas(
 )
 
 canvas.place(x = 0, y = 0)
-canvas.create_text(
-    268.0,
-    24.0,
-    anchor="nw",
-    text="Home",
-    fill="#000000",
-    font=("SegoeUI Bold", 40 * -1)
-)
-
 image_image_1 = PhotoImage(
     file=relative_to_assets("image_1.png"))
 image_1 = canvas.create_image(
-    280.0,
-    100.0,
+    128.0,
+    360.0,
     image=image_image_1
-)
-
-canvas.create_text(
-    300.0,
-    85.0,
-    anchor="nw",
-    text="Live stream",
-    fill="#000000",
-    font=("SegoeUI", 30 * -1)
-)
-
-canvas.create_text(
-    780.0,
-    89.0,
-    anchor="nw",
-    text="15:14",
-    fill="#000000",
-    font=("SegoeUI", 16 * -1)
-)
-
-canvas.create_text(
-    826.0,
-    89.0,
-    anchor="nw",
-    text="14/09/2024",
-    fill="#000000",
-    font=("SegoeUI", 16 * -1)
 )
 
 image_image_2 = PhotoImage(
     file=relative_to_assets("image_2.png"))
 image_2 = canvas.create_image(
-    588.0,
-    376.0,
-    image=image_image_2
-)
-
-image_image_3 = PhotoImage(
-    file=relative_to_assets("image_3.png"))
-image_3 = canvas.create_image(
-    128.0,
-    360.0,
-    image=image_image_3
-)
-
-image_image_4 = PhotoImage(
-    file=relative_to_assets("image_4.png"))
-image_4 = canvas.create_image(
     128.0,
     44.0,
-    image=image_image_4
+    image=image_image_2
 )
 
 button_image_1 = PhotoImage(
@@ -213,6 +161,208 @@ button_7.place(
     y=674.0,
     width=24.0,
     height=24.0
+)
+
+image_image_3 = PhotoImage(
+    file=relative_to_assets("image_3.png"))
+image_3 = canvas.create_image(
+    414.0,
+    44.0,
+    image=image_image_3
+)
+
+image_image_4 = PhotoImage(
+    file=relative_to_assets("image_4.png"))
+image_4 = canvas.create_image(
+    280.0,
+    100.0,
+    image=image_image_4
+)
+
+image_image_5 = PhotoImage(
+    file=relative_to_assets("image_5.png"))
+image_5 = canvas.create_image(
+    375.0,
+    100.0,
+    image=image_image_5
+)
+
+canvas.create_text(
+    780.0,
+    89.0,
+    anchor="nw",
+    text="15:14",
+    fill="#000000",
+    font=("SegoeUI", 16 * -1)
+)
+
+canvas.create_text(
+    826.0,
+    89.0,
+    anchor="nw",
+    text="14/09/2024",
+    fill="#000000",
+    font=("SegoeUI", 16 * -1)
+)
+
+image_image_6 = PhotoImage(
+    file=relative_to_assets("image_6.png"))
+image_6 = canvas.create_image(
+    588.0,
+    376.0,
+    image=image_image_6
+)
+
+image_image_7 = PhotoImage(
+    file=relative_to_assets("image_7.png"))
+image_7 = canvas.create_image(
+    1099.0,
+    219.0,
+    image=image_image_7
+)
+
+button_image_8 = PhotoImage(
+    file=relative_to_assets("button_8.png"))
+button_8 = Button(
+    image=button_image_8,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_8 clicked"),
+    relief="flat"
+)
+button_8.place(
+    x=983.0,
+    y=245.0,
+    width=72.0,
+    height=94.0
+)
+
+button_image_9 = PhotoImage(
+    file=relative_to_assets("button_9.png"))
+button_9 = Button(
+    image=button_image_9,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_9 clicked"),
+    relief="flat"
+)
+button_9.place(
+    x=1065.0,
+    y=245.0,
+    width=72.0,
+    height=94.0
+)
+
+button_image_10 = PhotoImage(
+    file=relative_to_assets("button_10.png"))
+button_10 = Button(
+    image=button_image_10,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_10 clicked"),
+    relief="flat"
+)
+button_10.place(
+    x=1147.0,
+    y=245.0,
+    width=72.0,
+    height=94.0
+)
+
+button_image_11 = PhotoImage(
+    file=relative_to_assets("button_11.png"))
+button_11 = Button(
+    image=button_image_11,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_11 clicked"),
+    relief="flat"
+)
+button_11.place(
+    x=983.0,
+    y=339.0,
+    width=72.0,
+    height=94.0
+)
+
+button_image_12 = PhotoImage(
+    file=relative_to_assets("button_12.png"))
+button_12 = Button(
+    image=button_image_12,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_12 clicked"),
+    relief="flat"
+)
+button_12.place(
+    x=1065.0,
+    y=339.0,
+    width=72.0,
+    height=94.0
+)
+
+button_image_13 = PhotoImage(
+    file=relative_to_assets("button_13.png"))
+button_13 = Button(
+    image=button_image_13,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_13 clicked"),
+    relief="flat"
+)
+button_13.place(
+    x=1147.0,
+    y=339.0,
+    width=72.0,
+    height=94.0
+)
+
+button_image_14 = PhotoImage(
+    file=relative_to_assets("button_14.png"))
+button_14 = Button(
+    image=button_image_14,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_14 clicked"),
+    relief="flat"
+)
+button_14.place(
+    x=983.0,
+    y=433.0,
+    width=72.0,
+    height=94.0
+)
+
+button_image_15 = PhotoImage(
+    file=relative_to_assets("button_15.png"))
+button_15 = Button(
+    image=button_image_15,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_15 clicked"),
+    relief="flat"
+)
+button_15.place(
+    x=1065.0,
+    y=433.0,
+    width=72.0,
+    height=94.0
+)
+
+button_image_16 = PhotoImage(
+    file=relative_to_assets("button_16.png"))
+button_16 = Button(
+    image=button_image_16,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_16 clicked"),
+    relief="flat"
+)
+button_16.place(
+    x=1147.0,
+    y=433.0,
+    width=72.0,
+    height=94.0
 )
 window.resizable(False, False)
 window.mainloop()

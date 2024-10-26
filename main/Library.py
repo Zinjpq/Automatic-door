@@ -68,7 +68,6 @@ def Detect_License_Plate():
         if key == ord('q'):  # Nhấn phím 'q' để thoát
             break
 
-
     cap.release()
     cv2.destroyAllWindows()
 # end function##########################################################################################################
