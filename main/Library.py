@@ -2,9 +2,21 @@
 
 import re
 import cv2
+import numpy as np
+import requests
+from PIL import Image, ImageTk, Label
 
 import DetectChars
 import DetectPlates
+
+#######################################################################################################################
+# ESP32-CAM URL and Control URLs
+url_or = 'http://192.168.4.184'
+url_cam = url_or + '/cam'
+url1 = url_or + '/left'
+url2 = url_or + '/right'
+url3 = url_or + '/up'
+url4 = url_or + '/down'
 
 # module level variables ################################################################################################ module level variables ##########################################################################
 SCALAR_BLACK = (0.0, 0.0, 0.0)
@@ -71,3 +83,41 @@ def Detect_License_Plate():
     cap.release()
     cv2.destroyAllWindows()
 # end function##########################################################################################################
+
+
+# Function to send control signals to ESP32
+def send_command(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            print(f"Command sent successfully: {url}")
+            status_label.config(text=f"Command successful: {url}")
+        else:
+            print(f"Error: {response.status_code}")
+            status_label.config(text=f"Error: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"Connection error: {e}")
+        status_label.config(text=f"Connection error: {e}")
+
+# Function to display video stream from ESP32-CAM
+def update_video():
+    try:
+        # Fetch the frame from ESP32-CAM
+        img_resp = requests.get(url_cam)
+        img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
+        frame = cv2.imdecode(img_arr, -1)
+
+        # Convert the frame to a format compatible with Tkinter
+        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(img)
+        imgtk = ImageTk.PhotoImage(image=img)
+
+        # Update the video label
+        video_label.imgtk = imgtk
+        video_label.config(image=imgtk)
+    except Exception as e:
+        print(f"Error in video stream: {e}")
+        status_label.config(text=f"Video stream error: {e}")
+
+    # Update the video every 30ms
+    root.after(30, update_video)
