@@ -6,17 +6,14 @@ import numpy as np
 import requests
 from PIL import Image, ImageTk
 import tkinter as tk
-
+from pathlib import Path
+from tkinter import Tk, Canvas, Button, PhotoImage, Frame, Label
+from datetime import datetime
 import DetectChars
 import DetectPlates
 
-from pathlib import Path
-from tkinter import Tk, Canvas, Button, PhotoImage, Frame, Label
-
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"D:\1.Projects\Automatic-door\main\assets")
-from datetime import datetime
-from tkinter import Canvas
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
