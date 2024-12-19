@@ -97,7 +97,8 @@ class HomeScene(BaseScene):
 class PlateArchiveScene(BaseScene):
     def __init__(self, parent):
         super().__init__(parent)
-        Label(self, text="Plate Archive", font=("Arial", 24), bg="#FFFFFF").pack(pady=20)
+        # Label(self, text="Plate Archive", font=("Arial", 24), bg="#FFFFFF").pack(pady=20)
+        Library.add_image("image_LicensePlateArchive.png", x=268, y=24)
 
 
 class CamControlScene(BaseScene):

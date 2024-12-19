@@ -1,14 +1,13 @@
 # Library.py
 
 import re
+from datetime import datetime
+from pathlib import Path
+from tkinter import Canvas, Button, PhotoImage, Frame, Label
 import cv2
 import numpy as np
 import requests
 from PIL import Image, ImageTk
-import tkinter as tk
-from pathlib import Path
-from tkinter import Tk, Canvas, Button, PhotoImage, Frame, Label
-from datetime import datetime
 import DetectChars
 import DetectPlates
 
@@ -114,65 +113,64 @@ def Detect_License_Plate():
 
 ########################################################################################################################
 # Function to display video stream from ESP32-CAM
-def update_video():
-    try:
-        # Fetch the frame from ESP32-CAM
-        img_resp = requests.get(url_cam)
-        img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
-        frame = cv2.imdecode(img_arr, -1)
-
-        # Convert the frame to a format compatible with Tkinter
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(img)
-        imgtk = ImageTk.PhotoImage(image=img)
-
-        # Update the video label
-        video_label.imgtk = imgtk
-        video_label.config(image=imgtk)
-    except Exception as e:
-        print(f"Error in video stream: {e}")
-        status_label.config(text=f"Video stream error: {e}")
-
-    # Update the video every 30ms
-    root.after(30, update_video)
+# def update_video():
+#     try:
+#         # Fetch the frame from ESP32-CAM
+#         img_resp = requests.get(url_cam)
+#         img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
+#         frame = cv2.imdecode(img_arr, -1)
+#
+#         # Convert the frame to a format compatible with Tkinter
+#         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         img = Image.fromarray(img)
+#         imgtk = ImageTk.PhotoImage(image=img)
+#
+#         # Update the video label
+#         video_label.imgtk = imgtk
+#         video_label.config(image=imgtk)
+#     except Exception as e:
+#         print(f"Error in video stream: {e}")
+#         status_label.config(text=f"Video stream error: {e}")
+#
+#     # Update the video every 30ms
+#     root.after(30, update_video)
 
 
 ########################################################################################################################
 
 # Function to handle key presses for movement controls
-def on_key_press(event):
-    if event.keysym in ["Left", "a", "A"]:
-        send_command(url1)  # Left
-    elif event.keysym in ["Right", "d", "D"]:
-        send_command(url2)  # Right
-    elif event.keysym in ["Up", "w", "W"]:
-        send_command(url3)  # Up
-    elif event.keysym in ["Down", "s", "S"]:
-        send_command(url4)  # Down
+# def on_key_press(event):
+#     if event.keysym in ["Left", "a", "A"]:
+#         send_command(url1)  # Left
+#     elif event.keysym in ["Right", "d", "D"]:
+#         send_command(url2)  # Right
+#     elif event.keysym in ["Up", "w", "W"]:
+#         send_command(url3)  # Up
+#     elif event.keysym in ["Down", "s", "S"]:
+#         send_command(url4)  # Down
 
 ########################################################################################################################
-def create_button(image_path, command, x, y, width, height):
+def create_button(image_path, parent, command, x, y, width, height):
             button_image = PhotoImage(file=relative_to_assets(image_path))
-            button = Button(image=button_image, borderwidth=0, highlightthickness=0, relief="flat",
+            button = Button(parent,image=button_image, borderwidth=0, highlightthickness=0, relief="flat",
                             command=command)
             button.image = button_image  # Keep a reference to avoid garbage collection
             button.place(x=x, y=y, width=width, height=height)
 
-def add_image(image_name, x, y):
-    """Add a static image to the sidebar."""
-    image = PhotoImage(file=relative_to_assets(image_name))
-    label = Label(image=image, bg="#F2F4F8")
-    label.image = image  # Keep reference to prevent garbage collection
+def add_image(image_path, parent, x=0, y=0):
+    image = PhotoImage(file=relative_to_assets(image_path))
+    label = Label(parent, image=image, bg=parent['bg'])
+    label.image = image  # Giữ tham chiếu để tránh bị xoá
     label.place(x=x, y=y)
 
 ########################################################################################################################
 def create_time_and_date_labels(parent, time_coords, date_coords, font, color="#000000"):
     # Create labels for time and date
     time_label = Label(parent, text="", font=font, fg=color, bg=parent["bg"])
-    time_label.place(x=time_coords[0], y=time_coords[1])
+    time_label.place(x=time_coords[0]-256, y=time_coords[1])
 
     date_label = Label(parent, text="", font=font, fg=color, bg=parent["bg"])
-    date_label.place(x=date_coords[0], y=date_coords[1])
+    date_label.place(x=date_coords[0]-256, y=date_coords[1])
 
     # Function to update time and date
     def update_time_and_date():
@@ -183,3 +181,63 @@ def create_time_and_date_labels(parent, time_coords, date_coords, font, color="#
         time_label.after(1000, update_time_and_date)  # Update every second
 
     update_time_and_date()
+
+########################################################################################################################
+import threading
+import time
+
+
+class LivestreamWidget(Frame):
+    def __init__(self, parent, camera_url):
+        super().__init__(parent, bg="#000000", width=640, height=480)
+        self.camera_url = camera_url
+        self.canvas = Canvas(self, bg="#000000", width=640, height=480, highlightthickness=0)
+        self.canvas.pack(fill="both", expand=True)
+
+        self.error_label = Label(self, bg="#F2F4F8")
+        self.error_image = ImageTk.PhotoImage(file=relative_to_assets("image_Cameraerror.png"))
+        self.error_label.config(image=self.error_image)
+        self.error_label.place(x=0, y=0)
+        self.error_label.lower()
+
+        self.running = True
+        threading.Thread(target=self.stream_video, daemon=True).start()
+
+    def stream_video(self):
+        while self.running:
+            try:
+                start_time = time.time()
+
+                # Tải ảnh từ camera
+                img_resp = requests.get(self.camera_url, timeout=2)
+                img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
+                frame = cv2.imdecode(img_arr, cv2.IMREAD_COLOR)
+
+                # Resize để giảm tải hệ thống
+                frame = cv2.resize(frame, (320, 240))
+                img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+                # Chuyển ảnh thành PhotoImage
+                photo = ImageTk.PhotoImage(image=Image.fromarray(img))
+
+                # Cập nhật Canvas trong main thread
+                self.canvas.after(0, self.update_canvas, photo)
+                self.error_label.lower()
+
+                # Giới hạn FPS (khoảng 10-15 FPS)
+                elapsed = time.time() - start_time
+                time.sleep(max(0.1 - elapsed, 0))  # Tối thiểu 100ms giữa các khung hình
+
+            except Exception:
+                self.canvas.after(0, self.show_camera_error)
+
+    def update_canvas(self, photo):
+        self.canvas.create_image(0, 0, anchor="nw", image=photo)
+        self.canvas.image = photo
+
+    def show_camera_error(self):
+        self.error_label.lift()
+        self.canvas.delete("all")
+
+    def stop(self):
+        self.running = False
