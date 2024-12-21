@@ -1,13 +1,20 @@
 import threading
-from datetime import time
-from tkinter import Frame, Canvas, Label, Image
+import time
+from datetime import datetime
+from pathlib import Path
+from tkinter import Button, PhotoImage, Label
+from tkinter import Frame, Canvas
 import cv2
 import numpy as np
 import requests
-from PIL import ImageTk
+from PIL import ImageTk, Image
 
-from main.Library import relative_to_assets
+from main.DetectPlateImage.MainDetectPlate import Detect_License_Plate
 
+
+def relative_to_assets(path: str) -> Path:
+    ASSETS_PATH = Path(__file__).parent.parent / "assets"
+    return ASSETS_PATH / Path(path)
 
 class LivestreamWidget(Frame):
     def __init__(self, parent, camera_url):
@@ -67,3 +74,58 @@ class LivestreamWidget(Frame):
 
     def stop(self):
         self.running = False
+
+def create_button(image_path, parent, command, x, y, width, height):
+    button_image = PhotoImage(file=relative_to_assets(image_path))
+    button = Button(parent, image=button_image, borderwidth=0, highlightthickness=0, relief="flat",
+                            command=command)
+    button.image = button_image  # Keep a reference to avoid garbage collection
+    button.place(x=x, y=y, width=width, height=height)
+
+
+def add_image(image_path, parent, x=0, y=0):
+    image = PhotoImage(file=relative_to_assets(image_path))
+    label = Label(parent, image=image, bg=parent['bg'])
+    label.image = image  # Giữ tham chiếu để tránh bị xoá
+    label.place(x=x, y=y)
+
+
+# Function to create time and date labels
+def create_time_and_date_labels(parent, time_coords, date_coords, font, color="#000000"):
+    # Create labels for time and date
+    time_label = Label(parent, text="", font=font, fg=color, bg=parent["bg"])
+    time_label.place(x=time_coords[0] - 256, y=time_coords[1])
+
+    date_label = Label(parent, text="", font=font, fg=color, bg=parent["bg"])
+    date_label.place(x=date_coords[0] - 256, y=date_coords[1])
+
+    # Function to update time and date
+    def update_time_and_date():
+        current_time = datetime.now().strftime("%H:%M:%S")
+        current_date = datetime.now().strftime("%d/%m/%Y")
+        time_label.config(text=current_time)
+        date_label.config(text=current_date)
+        time_label.after(1000, update_time_and_date)  # Update every second
+
+    update_time_and_date()
+
+def SavePlaceWithTime(image: Image.Image, beach_name: str):
+    output_dir = Path(__file__).parent / "images"
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    image_name = f"{beach_name}_{current_time}.jpg"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    image_path = output_dir / image_name
+    image.save(image_path)
+    # print(f"Ảnh đã được lưu tại: {image_path}")
+
+def detect_license_plate(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    plate_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_russian_plate_number.xml')
+    plates = plate_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    plate_images = []
+    for (x, y, w, h) in plates:
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        plate_images.append(gray[y:y + h, x:x + w])
+
+    return image, plate_images
