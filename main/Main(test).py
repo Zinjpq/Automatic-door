@@ -8,7 +8,7 @@ import Library
 
 # Constants
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"D:\1.Projects\Automatic-door\main\assets")
+ASSETS_PATH = OUTPUT_PATH / "assets"
 
 # ESP32-CAM URLs
 ESP32_BASE_URL = 'http://192.168.4.184'

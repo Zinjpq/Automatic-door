@@ -7,24 +7,23 @@ from tkinter import Canvas, Button, PhotoImage, Frame, Label
 import cv2
 import numpy as np
 import requests
-from PIL import Image, ImageTk
+from PIL import Image
+from PIL import ImageTk
+import threading
+import time
+
+# DetectPlate library
 import DetectChars
 import DetectPlates
 
-OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"D:\1.Projects\Automatic-door\main\assets")
-
-def relative_to_assets(path: str) -> Path:
-    return ASSETS_PATH / Path(path)
-
 #######################################################################################################################
 # ESP32-CAM URL and Control URLs
-url_or = 'http://192.168.4.184'
-url_cam = url_or + '/cam'
-url1 = url_or + '/left'
-url2 = url_or + '/right'
-url3 = url_or + '/up'
-url4 = url_or + '/down'
+ESP32_BASE_URL = url = 'http://192.168.3.184'
+CAMERA_URL = ESP32_BASE_URL + '/cam'
+# url1 = ESP32_BASE_URL + '/left'
+# url2 = ESP32_BASE_URL + '/right'
+# url3 = ESP32_BASE_URL + '/up'
+# url4 = ESP32_BASE_URL + '/down'
 
 # module level variables ################################################################################################ module level variables ##########################################################################
 SCALAR_BLACK = (0.0, 0.0, 0.0)
@@ -32,15 +31,10 @@ SCALAR_WHITE = (255.0, 255.0, 255.0)
 SCALAR_YELLOW = (0.0, 255.0, 255.0)
 SCALAR_RED = (0.0, 0.0, 255.0)
 ########################################################################################################################
-
-# urlOriginal = 'http://192.168.1.100'
-# url_cam = urlOriginal + '/cam'
-
-# url_up = urlOriginal + '/up'
-# url_down = urlOriginal + '/down'
-# url_left = urlOriginal + '/left'
-# url_right = urlOriginal + '/right'
-
+# Hàm để lấy đường dẫn tương đối của file trong thư mục assets
+def relative_to_assets(path: str) -> Path:
+    ASSETS_PATH = Path(__file__).parent / "assets"
+    return ASSETS_PATH / Path(path)
 
 ########################################################################################################################
 # Hàm để phát hiện và vẽ hộp bao quanh biển số xe
@@ -150,6 +144,7 @@ def Detect_License_Plate():
 #         send_command(url4)  # Down
 
 ########################################################################################################################
+# Function to create a button with an image
 def create_button(image_path, parent, command, x, y, width, height):
             button_image = PhotoImage(file=relative_to_assets(image_path))
             button = Button(parent,image=button_image, borderwidth=0, highlightthickness=0, relief="flat",
@@ -163,7 +158,7 @@ def add_image(image_path, parent, x=0, y=0):
     label.image = image  # Giữ tham chiếu để tránh bị xoá
     label.place(x=x, y=y)
 
-########################################################################################################################
+# Function to create time and date labels
 def create_time_and_date_labels(parent, time_coords, date_coords, font, color="#000000"):
     # Create labels for time and date
     time_label = Label(parent, text="", font=font, fg=color, bg=parent["bg"])
@@ -183,10 +178,7 @@ def create_time_and_date_labels(parent, time_coords, date_coords, font, color="#
     update_time_and_date()
 
 ########################################################################################################################
-import threading
-import time
-
-
+# Class to display a live video stream from a camera URL
 class LivestreamWidget(Frame):
     def __init__(self, parent, camera_url):
         super().__init__(parent, bg="#000000", width=640, height=480)
@@ -241,3 +233,14 @@ class LivestreamWidget(Frame):
 
     def stop(self):
         self.running = False
+
+#################################################
+# Hàm để lưu ảnh với thời gian
+def SavePlaceWithTime(image: Image.Image, beach_name: str):
+    output_dir = Path(__file__).parent / "images"
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    image_name = f"{beach_name}_{current_time}.jpg"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    image_path = output_dir / image_name
+    image.save(image_path)
+    # print(f"Ảnh đã được lưu tại: {image_path}")

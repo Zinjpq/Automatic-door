@@ -1,159 +1,144 @@
 // Code for Esp32-cam
 
+#include <WiFi.h>
+#include <esp32cam.h>
+#include <WebServer.h>
+#include "setup-esp32-cam.h"
 
+WebServer server(80); // Defines server as a global variable
 
-// #include <WiFi.h>
-// #include <esp32cam.h>
-// #include <WebServer.h>
-// #include "setup-esp32-cam.h"
+// Configure static IP settings
+IPAddress local_IP(192, 168, 3, 184);       // Set your desired static IP
+IPAddress gateway(192, 168, 3, 1);          // Typically the router's IP
+IPAddress subnet(255, 255, 255, 0);         // Subnet mask
 
-// WebServer server(80); // Defines server as a global variable
-
-// // Configure static IP settings
-// IPAddress local_IP(192, 168, 4, 184);       // Set your desired static IP
-// IPAddress gateway(192, 168, 4, 1);          // Typically the router's IP
-// IPAddress subnet(255, 255, 255, 0);         // Subnet mask
-
-// void setup() {
-//   Serial.begin(115200);
+void setup() {
+  Serial.begin(115200);
   
-//   setup_cam(); // Initializes the camera module
+  setup_cam(); // Initializes the camera module
   
-//   // Attempt to configure a static IP
-//   if (!WiFi.config(local_IP, gateway, subnet)) {
-//     Serial.println("Static IP configuration failed.");
-//   }
+  // Attempt to configure a static IP
+  if (!WiFi.config(local_IP, gateway, subnet)) {
+    Serial.println("Static IP configuration failed.");
+  }
 
-//   WiFi.begin("ESP32-Access Point", "12345678"); 
-//   Serial.print("Connecting to Wi-Fi");
+  WiFi.begin("Zinj", "A12345678!"); 
+  Serial.println("Connecting to Wi-Fi...");
 
-//   int counter = 0;
-//   while (WiFi.status() != WL_CONNECTED && counter < 20) {
-//     delay(1000);
-//     Serial.print(".");
-//     counter++;
-//   }
+  // Wait for Wi-Fi connection (can be removed if not needed)
+  // while (WiFi.status() != WL_CONNECTED) {
+  //   delay(100); // Short delay for connection stabilization
+  // }
 
-//   if (WiFi.status() == WL_CONNECTED) {
-//     Serial.println("\nConnected to Wi-Fi");
-//     Serial.print("IP Address: ");
-//     Serial.println(WiFi.localIP());
+  // Serial.println("\nConnected to Wi-Fi");
+  // Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
 
-//     server.on("/cam", handleImage);
-//     server.begin();
-//   } else {
-//     Serial.println("\nFailed to connect to Wi-Fi");
-//   }
-// }
+  // Setup server routes
+  server.on("/cam", handleImage);
+  server.begin();
+}
 
-// void loop() {
-//   server.handleClient(); // Handle HTTP requests
-// }
+void loop() {
+  server.handleClient(); // Handle HTTP requests
+}
 
 
 
 
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Code for Esp32
 
 
 
-#include <WiFi.h>
-#include <WebServer.h>
-#include <ESP32Servo.h>
+// #include <WiFi.h>
+// #include <WebServer.h>
+// #include <ESP32Servo.h>
 
-WebServer server(80); // Web server on port 80
+// WebServer server(80); // Web server on port 80
 
-// Servo objects for pan and tilt
-Servo panServo;
-Servo tiltServo;
+// // Servo objects for pan and tilt
+// Servo panServo;
+// Servo tiltServo;
 
-// Initial positions for pan and tilt
-int panAngle = 90; // Pan angle starts at 90 degrees
-int tiltAngle = 0; // Tilt angle starts at 0 degrees
+// // Initial positions for pan and tilt
+// int panAngle = 90; // Pan angle starts at 90 degrees
+// int tiltAngle = 0; // Tilt angle starts at 0 degrees
 
-// Maximum and minimum angles
-const int MIN_ANGLE = 0;
-const int MAX_ANGLE = 180;
+// // Maximum and minimum angles
+// const int MIN_ANGLE = 0;
+// const int MAX_ANGLE = 180;
 
-void handleRoot() {
-  server.send(200, "text/html", "<h1>Welcome to ESP32 Access Point</h1>");
-}
+// void handleRoot() {
+//   server.send(200, "text/html", "<h1>Welcome to ESP32 Access Point</h1>");
+// }
 
-void handleSave() {
-  server.send(200, "text/plain", "Wi-Fi info saved");
-}
+// void handleSave() {
+//   server.send(200, "text/plain", "Wi-Fi info saved");
+// }
 
-void handleLeft() {
-  panAngle = max(MIN_ANGLE, panAngle - 10);
-  panServo.write(panAngle);
-  server.send(200, "text/plain", "Moved Left");
-  Serial.println("Moved Left");
-}
+// void handleLeft() {
+//   panAngle = max(MIN_ANGLE, panAngle - 10);
+//   panServo.write(panAngle);
+//   server.send(200, "text/plain", "Moved Left");
+//   Serial.println("Moved Left");
+// }
 
-void handleRight() {
-  panAngle = min(MAX_ANGLE, panAngle + 10);
-  panServo.write(panAngle);
-  server.send(200, "text/plain", "Moved Right");
-  Serial.println("Moved Right");
-}
+// void handleRight() {
+//   panAngle = min(MAX_ANGLE, panAngle + 10);
+//   panServo.write(panAngle);
+//   server.send(200, "text/plain", "Moved Right");
+//   Serial.println("Moved Right");
+// }
 
-void handleUp() {
-  tiltAngle = min(MAX_ANGLE, tiltAngle + 10);
-  tiltServo.write(tiltAngle);
-  server.send(200, "text/plain", "Moved Up");
-  Serial.println("Moved Up");
-}
+// void handleUp() {
+//   tiltAngle = min(MAX_ANGLE, tiltAngle + 10);
+//   tiltServo.write(tiltAngle);
+//   server.send(200, "text/plain", "Moved Up");
+//   Serial.println("Moved Up");
+// }
 
-void handleDown() {
-  tiltAngle = max(MIN_ANGLE, tiltAngle - 10);
-  tiltServo.write(tiltAngle);
-  server.send(200, "text/plain", "Moved Down");
-  Serial.println("Moved Down");
-}
+// void handleDown() {
+//   tiltAngle = max(MIN_ANGLE, tiltAngle - 10);
+//   tiltServo.write(tiltAngle);
+//   server.send(200, "text/plain", "Moved Down");
+//   Serial.println("Moved Down");
+// }
 
-void setup_access_point() {
-  WiFi.softAP("ESP32-Access Point", "12345678");
-  Serial.println("Access Point mode started");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.softAPIP());
+// void setup_access_point() {
+//   WiFi.softAP("ESP32-Access Point", "12345678");
+//   Serial.println("Access Point mode started");
+//   Serial.print("IP Address: ");
+//   Serial.println(WiFi.softAPIP());
 
-  // Using GPIOs compatible with PWM (adjust if necessary)
-  panServo.attach(12);   // GPIO 12 for pan
-  tiltServo.attach(13);  // GPIO 13 for tilt
+//   // Using GPIOs compatible with PWM (adjust if necessary)
+//   panServo.attach(12);   // GPIO 12 for pan
+//   tiltServo.attach(13);  // GPIO 13 for tilt
 
-  // Initialize servos to initial angles
-  panServo.write(panAngle);
-  tiltServo.write(tiltAngle);
+//   // Initialize servos to initial angles
+//   panServo.write(panAngle);
+//   tiltServo.write(tiltAngle);
 
-  // Set up routes
-  server.on("/", handleRoot);
-  server.on("/save", HTTP_POST, handleSave);
-  server.on("/left", handleLeft);
-  server.on("/right", handleRight);
-  server.on("/up", handleUp);
-  server.on("/down", handleDown);
-  server.begin();
+//   // Set up routes
+//   server.on("/", handleRoot);
+//   server.on("/save", HTTP_POST, handleSave);
+//   server.on("/left", handleLeft);
+//   server.on("/right", handleRight);
+//   server.on("/up", handleUp);
+//   server.on("/down", handleDown);
+//   server.begin();
 
-  Serial.println("Web server started");
-}
+//   Serial.println("Web server started");
+// }
 
-void setup() {
-  Serial.begin(115200);
-  setup_access_point();
-}
+// void setup() {
+//   Serial.begin(115200);
+//   setup_access_point();
+// }
 
-void loop() {
-  server.handleClient(); // Handle incoming client requests
-}
-
-
+// void loop() {
+//   server.handleClient(); // Handle incoming client requests
+// }
 
 
 
@@ -162,12 +147,7 @@ void loop() {
 
 
 
-
-
-
-
-
-/////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Code cũ
 // #include <WiFi.h>
 // #include <WebServer.h>
