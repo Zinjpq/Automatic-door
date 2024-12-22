@@ -36,7 +36,7 @@ class Sidebar(Frame):
 
 class RightBar(Frame):
     def __init__(self, parent):
-        super().__init__(parent, width=360, height=720)
+        super().__init__(parent, width=336, height=480)
 
 
 class BaseScene(Frame):

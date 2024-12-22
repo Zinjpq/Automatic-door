@@ -1,9 +1,10 @@
 import re
+import os
 
 from main.DetectPlateImage import DetectPlates, DetectChars
 
 def Detect_License_Plate(imgOriginalScene):
-    blnKNNTrainingSuccessful = DetectChars.loadKNNDataAndTrainKNN()
+    DetectChars.loadKNNDataAndTrainKNN()
     listOfPossiblePlates, imgGrayscaleScene, imgThreshScene = DetectPlates.detectPlatesInScene(imgOriginalScene)           # detect plates
     listOfPossiblePlates = DetectChars.detectCharsInPlates(listOfPossiblePlates)        # detect chars in plates
 

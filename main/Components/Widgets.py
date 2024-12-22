@@ -75,6 +75,18 @@ class LivestreamWidget(Frame):
     def stop(self):
         self.running = False
 
+def detect_license_plate(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    plate_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_russian_plate_number.xml')
+    plates = plate_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    plate_images = []
+    for (x, y, w, h) in plates:
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        plate_images.append(gray[y:y + h, x:x + w])
+
+    return image, plate_images
+
 def create_button(image_path, parent, command, x, y, width, height):
     button_image = PhotoImage(file=relative_to_assets(image_path))
     button = Button(parent, image=button_image, borderwidth=0, highlightthickness=0, relief="flat",
@@ -118,14 +130,4 @@ def SavePlaceWithTime(image: Image.Image, beach_name: str):
     image.save(image_path)
     # print(f"Ảnh đã được lưu tại: {image_path}")
 
-def detect_license_plate(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    plate_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_russian_plate_number.xml')
-    plates = plate_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
-    plate_images = []
-    for (x, y, w, h) in plates:
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        plate_images.append(gray[y:y + h, x:x + w])
-
-    return image, plate_images

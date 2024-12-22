@@ -42,11 +42,15 @@ MIN_CONTOUR_AREA = 100
 
 ###################################################################################################
 def loadKNNDataAndTrainKNN():
+    base_dir = os.path.dirname(__file__)
+    classifications_path = os.path.join(base_dir, "classifications.txt")
+    flattened_images_path = os.path.join(base_dir, "flattened_images.txt")
+
     allContoursWithData = []  # declare empty lists,
     validContoursWithData = []  # we will fill these shortly
 
     try:
-        npaClassifications = np.loadtxt("classifications.txt", np.float32)  # read in training classifications
+        npaClassifications = np.loadtxt(classifications_path, np.float32)  # read in training classifications
     except:  # if file could not be opened
         print("error, unable to open classifications.txt, exiting program\n")  # show error message
         os.system("pause")
@@ -54,7 +58,7 @@ def loadKNNDataAndTrainKNN():
     # end try
 
     try:
-        npaFlattenedImages = np.loadtxt("flattened_images.txt", np.float32)  # read in training images
+        npaFlattenedImages = np.loadtxt(flattened_images_path, np.float32)  # read in training images
     except:  # if file could not be opened
         print("error, unable to open flattened_images.txt, exiting program\n")  # show error message
         os.system("pause")
