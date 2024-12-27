@@ -2,7 +2,7 @@
 
 #######################################################################################################################
 # ESP32-CAM URL and Control URLs
-ESP32_BASE_URL = 'http://192.168.3.184'
+ESP32_BASE_URL = 'http://192.168.4.184'
 CAMERA_URL = ESP32_BASE_URL + '/cam'
 # url1 = ESP32_BASE_URL + '/left'
 # url2 = ESP32_BASE_URL + '/right'

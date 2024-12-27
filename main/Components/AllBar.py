@@ -1,9 +1,12 @@
 import os
 from tkinter import Frame, Tk
+
 import customtkinter as ctk
 
 from main.Components import Widgets
+from main.Components.Widgets import AddLicensePlateText
 from main.Constants.urls import CAMERA_URL
+from main.Test import ShowPlateImage
 
 
 def AlarmButton():
@@ -65,13 +68,29 @@ class HomeScene(BaseScene):
         # folder =
         # AutoUpdateLicensePlateScene(self, parent, folder)
 
+        plate_file = "plate.txt"
+        self.AddLicensePlateText = AddLicensePlateText(self, plate_file)
+        self.AddLicensePlateText.place(x=932 - 256, y=136)
 
 class PlateArchiveScene(BaseScene):
     def __init__(self, parent):
         super().__init__(parent)
-        Widgets.add_image("image_LicensePlateArchive.png", parent=self, x=268 - 256, y=24)
+        Widgets.add_image("image_LicensePlateArchive.png", parent=self, x=12, y=24)
 
+        Widgets.create_time_and_date_labels(
+            parent=self,
+            time_coords=(12+256, 92),  # Vị trí hiển thị thời gian
+            date_coords=(88+256, 92),  # Vị trí hiển thị ngày
+            font=("SegoeUI", 17 * -1),  # Font chữ
+            color="#000000"  # Màu chữ
+        )
 
+        # self.AddLicenseText = ShowPlateImage(self, mode="large")
+        # self.AddLicenseText.place(x=12,y=136)
+        plate_file = "plate.txt"
+
+        self.AddLicensePlateText =  AddLicensePlateText(self,plate_file)
+        self.AddLicensePlateText.place(x=932-256,y=136)
 class CamControlScene(BaseScene):
     def __init__(self, parent):
         super().__init__(parent)

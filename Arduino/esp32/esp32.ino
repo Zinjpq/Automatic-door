@@ -8,8 +8,8 @@
 WebServer server(80); // Defines server as a global variable
 
 // Configure static IP settings
-IPAddress local_IP(192, 168, 3, 184);       // Set your desired static IP
-IPAddress gateway(192, 168, 3, 1);          // Typically the router's IP
+IPAddress local_IP(192, 168, 4, 184);       // Set your desired static IP
+IPAddress gateway(192, 168, 4, 1);          // Typically the router's IP
 IPAddress subnet(255, 255, 255, 0);         // Subnet mask
 
 void setup() {
@@ -22,7 +22,7 @@ void setup() {
     Serial.println("Static IP configuration failed.");
   }
 
-  WiFi.begin("Zinj", "A12345678!"); 
+  WiFi.begin("ESP32-Access Point", "12345678"); 
   Serial.println("Connecting to Wi-Fi...");
 
   // Wait for Wi-Fi connection (can be removed if not needed)

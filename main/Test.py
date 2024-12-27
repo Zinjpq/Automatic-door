@@ -1,84 +1,84 @@
+from datetime import datetime
+import random
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import ttk
+from tkinter import Frame, ttk
 
-class LicensePlateManager:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("License Plate Manager")
-        self.root.geometry("1280x720")
+from PIL import Image, ImageTk
 
-        # Frame chính
-        self.main_frame = tk.Frame(root, width=336, height=480, bg="lightgray", relief="solid", bd=1)
-        self.main_frame.place(x=800, y=136)
+class ShowPlateImage(Frame):
+    def __init__(self, parent, mode="small"):
+        # Xác định kích thước và font chữ dựa trên mode
+        if mode == "large":
+            self.width = 640
+            self.height = 570
+            self.title_font = ("Arial", 20, "bold")
+            self.plate_font = ("Arial", 16, "bold")
+            self.time_font = ("Arial", 14)
+            self.padding = {"padx": 10, "pady": 8}
+            self.image_size = (300, 150)
+        else:  # Mặc định là "small"
+            self.width = 336
+            self.height = 480
+            self.title_font = ("Arial", 16, "bold")
+            self.plate_font = ("Arial", 12)
+            self.time_font = ("Arial", 12)
+            self.padding = {"padx": 5, "pady": 5}
+            self.image_size = (200, 100)
+
+        super().__init__(parent, width=self.width, height=self.height, bg="lightgray", relief="solid", bd=1)
+        self.place(x=(1280 - self.width) // 2, y=(720 - self.height) // 2)  # Căn giữa màn hình
 
         # Tiêu đề phía trên
-        self.title_label = tk.Label(self.main_frame, text="Tên biển hợp lệ", bg="lightgray", font=("Arial", 16, "bold"))
+        self.title_label = tk.Label(self, text="Lịch sử Biển Số", bg="lightgray", font=self.title_font)
         self.title_label.pack(pady=10)
 
         # Frame cuộn
-        self.scroll_frame = tk.Frame(self.main_frame, bg="white")
+        self.scroll_frame = tk.Frame(self, bg="white")
         self.scroll_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Canvas để hỗ trợ cuộn
         self.canvas = tk.Canvas(self.scroll_frame, bg="white")
         self.scrollable_frame = tk.Frame(self.canvas, bg="white")
 
-        # Scrollbar dọc
         self.scrollbar = ttk.Scrollbar(self.scroll_frame, orient="vertical", command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
-        # Vị trí scrollbar và canvas
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Kết nối canvas và frame
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.scrollable_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
 
-        # Danh sách lưu các biển số
-        self.labels = []
+        self.entries = []
 
-        # Phần thêm mới biển
-        self.add_frame = tk.Frame(self.main_frame, bg="lightgray")
-        self.add_frame.pack(pady=10)
+        # Nút tạo ngẫu nhiên ảnh để test
+        self.test_frame = tk.Frame(self, bg="lightgray")
+        self.test_frame.pack(pady=10)
 
-        self.entry = tk.Entry(self.add_frame, font=("Arial", 12), width=20)
-        self.entry.grid(row=0, column=0, padx=5)
+        self.test_button = tk.Button(self.test_frame, text="Tạo ngẫu nhiên", command=self.add_random_entry, font=("Arial", 12))
+        self.test_button.pack(padx=5)
 
-        self.add_button = tk.Button(self.add_frame, text="Thêm biển", command=self.add_label, font=("Arial", 12))
-        self.add_button.grid(row=0, column=1, padx=5)
+    def add_random_entry(self):
+        plate_number = f"{random.randint(10, 99)}A-{random.randint(1000, 9999)}"
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    def add_label(self):
-        text = self.entry.get().strip()
-        if text:
-            # Tạo frame cho label và nút xóa
-            label_container = tk.Frame(self.scrollable_frame, bg="white")
-            label_container.pack(fill=tk.X, padx=5, pady=2)
+        entry_frame = tk.Frame(self.scrollable_frame, bg="white", relief="solid", bd=1)
+        entry_frame.pack(fill=tk.X, **self.padding)
 
-            label = tk.Label(label_container, text=text, bg="white", font=("Arial", 12))
-            label.pack(side=tk.LEFT, padx=5)
+        # Tạo ảnh giả ngẫu nhiên
+        image = Image.new("RGB", self.image_size, (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255)))
+        photo = ImageTk.PhotoImage(image)
+        image_label = tk.Label(entry_frame, image=photo, bg="white")
+        image_label.image = photo
+        image_label.pack(side=tk.LEFT, padx=10)
 
-            delete_button = tk.Button(
-                label_container, text="Xóa", font=("Arial", 10),
-                command=lambda: self.delete_label(label_container)
-            )
-            delete_button.pack(side=tk.RIGHT, padx=5)
+        # Thông tin bên cạnh ảnh
+        info_frame = tk.Frame(entry_frame, bg="white")
+        info_frame.pack(side=tk.LEFT, padx=15, pady=5)
 
-            # Lưu label
-            self.labels.append(label_container)
+        plate_label = tk.Label(info_frame, text=f"Biển số: {plate_number}", bg="white", font=self.plate_font)
+        plate_label.pack(anchor="w")
 
-            # Xóa nội dung trong ô nhập
-            self.entry.delete(0, tk.END)
-        else:
-            messagebox.showwarning("Cảnh báo", "Vui lòng nhập tên biển!")
+        time_label = tk.Label(info_frame, text=f"Thời gian: {timestamp}", bg="white", font=self.time_font)
+        time_label.pack(anchor="w")
 
-    def delete_label(self, label_container):
-        label_container.destroy()
-        self.labels.remove(label_container)
-
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = LicensePlateManager(root)
-    root.mainloop()
+        self.entries.append(entry_frame)
