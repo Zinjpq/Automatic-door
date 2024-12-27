@@ -218,31 +218,22 @@ class AddLicensePlateText(Frame):
         label_container.destroy()
         self.save_plates_to_file()
 
-class ShowPlateHistory(Frame):
-    def __init__(self, parent):
+class ShowPlateImage(Frame):
+    def __init__(self, parent,):
         super().__init__(parent)
+        self.pack_propagate(False)
 
         # Tiêu đề phía trên
         self.title_label = tk.Label(self, text="Ảnh biển số", bg="lightgray", font=("Arial", 16, "bold"))
         self.title_label.pack(pady=10)
-
-        # Frame cuộn
         self.scroll_frame = tk.Frame(self, bg="white")
         self.scroll_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-
-        # Canvas để hỗ trợ cuộn
         self.canvas = tk.Canvas(self.scroll_frame, bg="white")
         self.scrollable_frame = tk.Frame(self.canvas, bg="white")
-
-        # Scrollbar dọc
         self.scrollbar = ttk.Scrollbar(self.scroll_frame, orient="vertical", command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-
-        # Vị trí scrollbar và canvas
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        # Kết nối canvas và frame
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.scrollable_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
 

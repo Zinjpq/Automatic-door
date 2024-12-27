@@ -55,7 +55,7 @@ def Detect_License_Plate(imgOriginalScene):
                         os.makedirs(output_dir)
 
                     # Lấy thời gian hiện tại để đặt tên file
-                    current_time = time.strftime("%H%M%S")
+                    current_time = time.strftime("%d%m%Y_%H%M%S")
 
                     # Tạo tên file là biển số + giờ
                     file_name = os.path.join(output_dir, f"{current_time}_{licPlate.strChars}.png")

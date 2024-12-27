@@ -4,9 +4,9 @@ from tkinter import Frame, Tk
 import customtkinter as ctk
 
 from main.Components import Widgets
-from main.Components.Widgets import AddLicensePlateText
+from main.Components.Widgets import AddLicensePlateText, ShowPlateImage
 from main.Constants.urls import CAMERA_URL
-from main.Test import ShowPlateImage
+from main.Test import ShowPlateImage1
 
 
 def AlarmButton():
@@ -67,10 +67,9 @@ class HomeScene(BaseScene):
         self.livestream.place(x=268 - 256, y=136)
         # folder =
         # AutoUpdateLicensePlateScene(self, parent, folder)
+        self.AddLicenseText = ShowPlateImage1(self, mode="small")
+        self.AddLicenseText.place(x=932-256, y=136)
 
-        plate_file = "plate.txt"
-        self.AddLicensePlateText = AddLicensePlateText(self, plate_file)
-        self.AddLicensePlateText.place(x=932 - 256, y=136)
 
 class PlateArchiveScene(BaseScene):
     def __init__(self, parent):
@@ -85,10 +84,10 @@ class PlateArchiveScene(BaseScene):
             color="#000000"  # Màu chữ
         )
 
-        # self.AddLicenseText = ShowPlateImage(self, mode="large")
-        # self.AddLicenseText.place(x=12,y=136)
-        plate_file = "plate.txt"
+        self.AddLicenseText = ShowPlateImage1(self, mode="large")
+        self.AddLicenseText.place(x=12,y=136)
 
+        plate_file = "plate.txt"
         self.AddLicensePlateText =  AddLicensePlateText(self,plate_file)
         self.AddLicensePlateText.place(x=932-256,y=136)
 class CamControlScene(BaseScene):
@@ -175,7 +174,7 @@ class MainWindow:
             4: SettingsScene(self.root),
         }
         self.current_scene = None
-        self.switch_screen(1)
+        self.switch_screen(2)
 
     def switch_screen(self, screen_id: int):
         if self.current_scene:
