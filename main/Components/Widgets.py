@@ -1,4 +1,4 @@
-import random
+import os
 import re
 import threading
 import time
@@ -219,13 +219,24 @@ class AddLicensePlateText(Frame):
         self.save_plates_to_file()
 
 class ShowPlateImage(Frame):
-    def __init__(self, parent,):
-        super().__init__(parent)
+    def __init__(self, parent, mode="small"):
+        self.image_size = None
+        self.padding = None
+        self.time_font = None
+        self.plate_font = None
+        self.title_font = None
+        self.height = None
+        self.width = None
+        self.set_mode(mode)
+
+        super().__init__(parent, width=self.width, height=self.height, bg="lightgray", relief="solid", bd=1)
         self.pack_propagate(False)
 
         # Tiêu đề phía trên
-        self.title_label = tk.Label(self, text="Ảnh biển số", bg="lightgray", font=("Arial", 16, "bold"))
-        self.title_label.pack(pady=10)
+        self.title_label = tk.Label(self, text="Lịch sử Biển Số", bg="lightgray", font=self.title_font)
+        self.title_label.pack(pady=3)
+
+        # Frame cuộn
         self.scroll_frame = tk.Frame(self, bg="white")
         self.scroll_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         self.canvas = tk.Canvas(self.scroll_frame, bg="white")
@@ -237,41 +248,96 @@ class ShowPlateImage(Frame):
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.scrollable_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
 
-        # Danh sách lưu các ảnh và thông tin
         self.entries = []
+        self.existing_files = set()  # Để theo dõi các ảnh đã hiển thị
 
-        # Nút tạo ngẫu nhiên ảnh để test
-        self.test_frame = tk.Frame(self, bg="lightgray")
-        self.test_frame.pack(pady=10)
+        self.update_data_from_folder()
+        self.auto_update()
 
-        self.test_button = tk.Button(self.test_frame, text="Tạo ngẫu nhiên", command=self.add_random_entry, font=("Arial", 12))
-        self.test_button.pack(padx=5)
+    def set_mode(self, mode):
+        """Cập nhật chế độ (small/large) cho giao diện"""
+        if mode == "large":
+            self.width = 640
+            self.height = 480
+            self.title_font = ("Arial", 20, "bold")
+            self.plate_font = ("Arial", 16, "bold")
+            self.time_font = ("Arial", 14)
+            self.padding = {"padx": 10, "pady": 8}
+            self.image_size = (300, 150)
+        else:  # Mặc định là "small"
+            self.width = 336
+            self.height = 480
+            self.title_font = ("Arial", 16, "bold")
+            self.plate_font = ("Arial", 12)
+            self.time_font = ("Arial", 12)
+            self.padding = {"padx": 5, "pady": 5}
+            self.image_size = (200, 100)
 
-    def add_random_entry(self):
-        # Tạo thông tin ngẫu nhiên
-        plate_number = f"{random.randint(10, 99)}A-{random.randint(1000, 9999)}"
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        # Tạo frame cho mỗi mục
+    def add_entry(self, plate_number, timestamp, image_path):
+        """Thêm một entry mới vào frame"""
         entry_frame = tk.Frame(self.scrollable_frame, bg="white", relief="solid", bd=1)
-        entry_frame.pack(fill=tk.X, padx=5, pady=5)
+        entry_frame.pack(fill=tk.X, **self.padding)
 
-        # Hình ảnh ngẫu nhiên (sử dụng ảnh mặc định)
-        image = Image.new("RGB", (200, 100), (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255)))  # Tạo ảnh giả
+        # Tạo ảnh từ file
+        image = Image.open(image_path)
+        image = image.resize(self.image_size)  # Đảm bảo ảnh vừa với kích thước đã xác định
         photo = ImageTk.PhotoImage(image)
         image_label = tk.Label(entry_frame, image=photo, bg="white")
-        image_label.image = photo  # Giữ tham chiếu để ảnh không bị xóa
-        image_label.pack(side=tk.LEFT, padx=5)
+        image_label.image = photo
+        image_label.pack(side=tk.LEFT, padx=10)
 
-        # Thông tin bên dưới
+        # Thông tin bên cạnh ảnh
         info_frame = tk.Frame(entry_frame, bg="white")
-        info_frame.pack(side=tk.LEFT, padx=10, pady=5)
+        info_frame.pack(side=tk.LEFT, padx=15, pady=5)
 
-        plate_label = tk.Label(info_frame, text=f"Biển số: {plate_number}", bg="white", font=("Arial", 12))
+        plate_label = tk.Label(info_frame, text=f"Biển số: {plate_number}", bg="white", font=self.plate_font)
         plate_label.pack(anchor="w")
 
-        time_label = tk.Label(info_frame, text=f"Thời gian: {timestamp}", bg="white", font=("Arial", 12))
+        time_label = tk.Label(info_frame, text=f"Thời gian: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", bg="white",
+                              font=self.time_font)
         time_label.pack(anchor="w")
 
-        # Lưu entry
         self.entries.append(entry_frame)
+
+    def update_data_from_folder(self, folder_path="Detectedplate"):
+        """Cập nhật dữ liệu từ thư mục với các ảnh có tên theo định dạng"""
+        # Kiểm tra nếu thư mục tồn tại
+        if not os.path.exists(folder_path):
+            print(f"Thư mục {folder_path} không tồn tại.")
+            return
+
+        # Lấy danh sách các tệp tin trong thư mục
+        files = os.listdir(folder_path)
+
+        # Lọc các tệp tin hình ảnh với định dạng đúng
+        image_files = [f for f in files if f.endswith(".png") and len(f.split("_")) == 3]
+
+        # Lấy danh sách các ảnh đã hiển thị để tránh hiển thị lại
+        current_files = set(image_files)
+
+        # Tìm các file mới, nếu có
+        new_files = current_files - self.existing_files
+
+        # Cập nhật các ảnh mới
+        for file_name in new_files:
+            # Lấy thông tin từ tên tệp
+            try:
+                date_str, time_str, plate_number_with_extension = file_name.split("_")
+                plate_number = plate_number_with_extension.split(".")[0]
+                timestamp_str = f"{date_str[:2]}-{date_str[2:4]}-{date_str[4:8]} {time_str[:2]}:{time_str[2:4]}:00"
+                timestamp = datetime.strptime(timestamp_str, "%d-%m-%Y %H:%M:%S")
+            except ValueError:
+                print(f"Không thể phân tích tên tệp: {file_name}")
+                continue
+
+            # Thêm entry mới vào giao diện
+            image_path = os.path.join(folder_path, file_name)
+            self.add_entry(plate_number, timestamp, image_path)
+
+        # Cập nhật danh sách các ảnh đã hiển thị
+        self.existing_files.update(new_files)
+
+    def auto_update(self):
+        """Automatically check for new images every 3 seconds"""
+        self.update_data_from_folder()  # Check for new images
+        self.after(1000, self.auto_update)  # Call auto_update again in 3 seconds

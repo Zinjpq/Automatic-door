@@ -23,7 +23,7 @@ void setup() {
   }
 
   WiFi.begin("ESP32-Access Point", "12345678"); 
-  Serial.println("Connecting to Wi-Fi...");
+  // Serial.println("Connecting to Wi-Fi...");
 
   // Wait for Wi-Fi connection (can be removed if not needed)
   // while (WiFi.status() != WL_CONNECTED) {
@@ -32,7 +32,7 @@ void setup() {
 
   // Serial.println("\nConnected to Wi-Fi");
   // Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
+  // Serial.println(WiFi.localIP());
 
   // Setup server routes
   server.on("/cam", handleImage);

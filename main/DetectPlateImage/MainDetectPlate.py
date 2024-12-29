@@ -50,7 +50,7 @@ def Detect_License_Plate(imgOriginalScene):
                     imgPlate = licPlate.imgPlate
 
                     # Tạo thư mục nếu chưa tồn tại
-                    output_dir = 'detectedplate'
+                    output_dir = 'Detectedplate'
                     if not os.path.exists(output_dir):
                         os.makedirs(output_dir)
 

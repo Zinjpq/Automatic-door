@@ -6,7 +6,6 @@ import customtkinter as ctk
 from main.Components import Widgets
 from main.Components.Widgets import AddLicensePlateText, ShowPlateImage
 from main.Constants.urls import CAMERA_URL
-from main.Test import ShowPlateImage1
 
 
 def AlarmButton():
@@ -62,12 +61,11 @@ class HomeScene(BaseScene):
             color="#000000"  # Màu chữ
         )
 
-        # Library.add_image("image_Cameraerror.png", parent=self, x=268-256, y=136)
         self.livestream = Widgets.LivestreamWidget(self, CAMERA_URL)
         self.livestream.place(x=268 - 256, y=136)
         # folder =
         # AutoUpdateLicensePlateScene(self, parent, folder)
-        self.AddLicenseText = ShowPlateImage1(self, mode="small")
+        self.AddLicenseText = ShowPlateImage(self, mode="small")
         self.AddLicenseText.place(x=932-256, y=136)
 
 
@@ -84,7 +82,7 @@ class PlateArchiveScene(BaseScene):
             color="#000000"  # Màu chữ
         )
 
-        self.AddLicenseText = ShowPlateImage1(self, mode="large")
+        self.AddLicenseText = ShowPlateImage(self, mode="large")
         self.AddLicenseText.place(x=12,y=136)
 
         plate_file = "plate.txt"
@@ -96,7 +94,7 @@ class CamControlScene(BaseScene):
         Widgets.add_image("image_CameraControl.png", parent=self, x=268 - 256, y=24)
         Widgets.add_image("image_Livestream.png", parent=self, x=300 - 256, y=88)
         Widgets.add_image("image_livestream2.png", parent=self, x=268 - 256, y=88)
-        Widgets.add_image("image_control.png", parent=self, x=959 - 256, y=201)
+        Widgets.add_image("image_ControlLabel.png", parent=self, x=920 - 256, y=136)
 
         Widgets.create_time_and_date_labels(
             parent=self,
@@ -110,17 +108,17 @@ class CamControlScene(BaseScene):
         self.livestream = Widgets.LivestreamWidget(self, CAMERA_URL)
         self.livestream.place(x=268 - 256, y=136)
         buttons = [
-            ("button_up.png", click_up, 1065, 245),
-            ("button_down.png", on_click, 1065, 433),
-            ("button_left.png", on_click, 983, 339),
-            ("button_right.png", on_click, 1147, 339),
-            ("button_zoomin.png", on_click, 983, 245),
-            ("button_zoomout.png", on_click, 1147, 433),
-            ("button_reset.png", on_click, 1147, 245),
-            ("button_reset (2).png", on_click, 983, 433),
+            ("button_up.png", click_up, 1045, 196),
+            ("button_down.png", on_click, 1045, 476),
+            ("button_left.png", on_click, 923, 336),
+            ("button_right.png", on_click, 1170, 336),
+            ("button_zoomin.png", on_click, 923, 196),
+            ("button_zoomout.png", on_click, 923, 476),
+            ("button_ResetZoom.png", on_click, 1170, 476),
+            ("button_ResetRadius.png", on_click, 1170, 196),
         ]
         for image, command, x, y in buttons:
-            Widgets.create_button(image, self, command, x=x - 256, y=y, width=72, height=94)
+            Widgets.create_button(image, self, command, x=x - 256, y=y, width=110, height=140)
 
 
 class SettingsScene(BaseScene):
@@ -174,7 +172,7 @@ class MainWindow:
             4: SettingsScene(self.root),
         }
         self.current_scene = None
-        self.switch_screen(2)
+        self.switch_screen(3)
 
     def switch_screen(self, screen_id: int):
         if self.current_scene:
