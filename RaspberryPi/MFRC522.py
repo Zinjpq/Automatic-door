@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+!/usr/bin/env python
 # -*- coding: utf8 -*-
 #
 #    Copyright 2014,2018 Mario Gomez <mario.gomez@teubi.co>

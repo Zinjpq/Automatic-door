@@ -1,21 +1,13 @@
-import os
 from tkinter import Frame, Tk
 
-import customtkinter as ctk
-
 from main.Components import Widgets
-from main.Components.Widgets import AddLicensePlateText, ShowPlateImage
+from main.Components.Widgets import AddLicensePlateText, ShowPlateImage, ButtonMoveCam
 from main.Constants.urls import CAMERA_URL
 
 
 def AlarmButton():
     print("AlarmButton clicked")
 
-def on_click():
-    print("Button clicked!")
-
-def click_up():
-    print("clicked up")
 
 class Sidebar(Frame):
     def __init__(self, parent, switch_screen_callback):
@@ -108,14 +100,14 @@ class CamControlScene(BaseScene):
         self.livestream = Widgets.LivestreamWidget(self, CAMERA_URL)
         self.livestream.place(x=268 - 256, y=136)
         buttons = [
-            ("button_up.png", click_up, 1045, 196),
-            ("button_down.png", on_click, 1045, 476),
-            ("button_left.png", on_click, 923, 336),
-            ("button_right.png", on_click, 1170, 336),
-            ("button_zoomin.png", on_click, 923, 196),
-            ("button_zoomout.png", on_click, 923, 476),
-            ("button_ResetZoom.png", on_click, 1170, 476),
-            ("button_ResetRadius.png", on_click, 1170, 196),
+            ("button_up.png", lambda: ButtonMoveCam("up"), 1045, 196),
+            ("button_down.png", lambda: ButtonMoveCam("down"), 1045, 476),
+            ("button_left.png",lambda:  ButtonMoveCam("left"), 923, 336),
+            ("button_right.png", lambda: ButtonMoveCam("right"), 1170, 336),
+            # ("button_zoomin.png", on_click, 923, 196),
+            # ("button_zoomout.png", on_click, 923, 476),
+            # ("button_ResetZoom.png", on_click, 1170, 476),
+            # ("button_ResetRadius.png", on_click, 1170, 196),
         ]
         for image, command, x, y in buttons:
             Widgets.create_button(image, self, command, x=x - 256, y=y, width=110, height=140)
@@ -125,33 +117,6 @@ class SettingsScene(BaseScene):
     def __init__(self, parent):
         super().__init__(parent)
 
-
-class AutoUpdateLicensePlateScene(RightBar):
-    def __init__(self, parent, fold_path):
-        super().__init__(parent)
-        self.fold_path = fold_path
-
-        # Khung cuon
-        self.scroll_frame = ctk.CTkScrollableFrame(self, width=580, height=350)
-        self.scroll_frame.grid(row=0, column=0, padx=959, pady=201)
-
-        self.Filelist = []
-
-        self.UpdateFileList()
-
-        self.CheckNewFiles()
-
-    def UpdateFileList(self):
-        files = os.listdir(self.fold_path)
-        for filename in sorted(files):
-            if filename.endswith(".txt") and filename not in self.Filelist:
-                self.Filelist.append(filename)
-                label = ctk.CTkLabel(self.scroll_frame, text=filename)
-                label.pack(pady=5)
-
-    def CheckNewFiles(self):
-        self.UpdateFileList()
-        self.after(2000, self.CheckNewFiles)
 
 class MainWindow:
     def __init__(self, root: Tk):

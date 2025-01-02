@@ -11,6 +11,7 @@ import numpy as np
 import requests
 from PIL import Image, ImageTk
 
+from main.Constants.urls import RasPi_Base_URL
 from main.DetectPlateImage.MainDetectPlate import Detect_License_Plate
 
 
@@ -276,7 +277,7 @@ class ShowPlateImage(Frame):
     def add_entry(self, plate_number, timestamp, image_path):
         """Thêm một entry mới vào frame"""
         entry_frame = tk.Frame(self.scrollable_frame, bg="white", relief="solid", bd=1)
-        entry_frame.pack(fill=tk.X, **self.padding)
+        entry_frame.pack(fill=tk.X, side=tk.TOP, **self.padding)  # Sử dụng side=tk.TOP để thêm entry lên đầu
 
         # Tạo ảnh từ file
         image = Image.open(image_path)
@@ -297,7 +298,7 @@ class ShowPlateImage(Frame):
                               font=self.time_font)
         time_label.pack(anchor="w")
 
-        self.entries.append(entry_frame)
+        self.entries.insert(0, entry_frame)  # Đẩy entry mới vào đầu danh sách các entries
 
     def update_data_from_folder(self, folder_path="Detectedplate"):
         """Cập nhật dữ liệu từ thư mục với các ảnh có tên theo định dạng"""
@@ -338,6 +339,24 @@ class ShowPlateImage(Frame):
         self.existing_files.update(new_files)
 
     def auto_update(self):
-        """Automatically check for new images every 3 seconds"""
         self.update_data_from_folder()  # Check for new images
-        self.after(1000, self.auto_update)  # Call auto_update again in 3 seconds
+        self.after(1000, self.auto_update)
+
+
+def send_request(direction):
+    try:
+        if direction == "up":
+            requests.get(RasPi_Base_URL + "/up")
+        elif direction == "down":
+            requests.get(RasPi_Base_URL + "/down")
+        elif direction == "right":
+            requests.get(RasPi_Base_URL + "/right")
+        elif direction == "left":
+            requests.get(RasPi_Base_URL + "/left")
+    except requests.RequestException as e:
+        print(f"Error sending request: {e}")
+
+# Hàm di chuyển camera
+def ButtonMoveCam(direction):
+    # Chạy yêu cầu trong một luồng riêng biệt để không làm treo ứng dụng Tkinter
+    threading.Thread(target=send_request, args=(direction,)).start()
