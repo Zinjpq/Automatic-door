@@ -264,15 +264,15 @@ class ShowPlateImage(Frame):
             self.plate_font = ("Arial", 16, "bold")
             self.time_font = ("Arial", 14)
             self.padding = {"padx": 10, "pady": 8}
-            self.image_size = (300, 150)
+            self.image_size = (52*6, 11*6)
         else:  # Mặc định là "small"
             self.width = 336
             self.height = 480
             self.title_font = ("Arial", 16, "bold")
-            self.plate_font = ("Arial", 12)
-            self.time_font = ("Arial", 12)
+            self.plate_font = ("Arial", 8)
+            self.time_font = ("Arial", 8)
             self.padding = {"padx": 5, "pady": 5}
-            self.image_size = (200, 100)
+            self.image_size = (52*3, 11*3)
 
     def add_entry(self, plate_number, timestamp, image_path):
         """Thêm một entry mới vào frame"""
