@@ -1,10 +1,13 @@
-# Auto detect text files and perform LF normalization
 * text=auto
 
-.env
+# Bỏ qua các thư mục và file không cần thiết
+.env/
 __pycache__/
+.idea/
+Project Backups/
+
+# Bỏ qua các file không cần theo dõi
 *.pyc
 *.pyo
 *.log
 *.workspace
-*.idea/
