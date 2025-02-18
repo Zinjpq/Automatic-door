@@ -2,3 +2,9 @@
 * text=auto
 
 .env
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.workspace
+*.idea/
