@@ -1,13 +1,35 @@
+# Chuẩn hóa ký tự xuống dòng
 * text=auto
 
-# Bỏ qua các thư mục và file không cần thiết
-.env/
-__pycache__/
-.idea/
-Project Backups/
+# Xử lý file nhị phân
+*.jpg binary
+*.png binary
+*.gif binary
+*.mp4 binary
+*.zip binary
+*.exe binary
+*.dll binary
 
-# Bỏ qua các file không cần theo dõi
-*.pyc
-*.pyo
-*.log
-*.workspace
+# Bỏ qua file log khi merge
+*.log merge=drop
+*.lock merge=drop
+
+# Đảm bảo các file code luôn dùng LF
+*.py text eol=lf
+*.c text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+
+# Loại bỏ file hệ thống của macOS
+.DS_Store binary
+
+# Windows script giữ CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Nếu sử dụng Git LFS (tùy chọn)
+*.psd filter=lfs diff=lfs merge=lfs
+*.mp4 filter=lfs diff=lfs merge=lfs
