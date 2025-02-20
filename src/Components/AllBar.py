@@ -137,7 +137,7 @@ class MainWindow:
             4: SettingsScene(self.root),
         }
         self.current_scene = None
-        self.switch_screen(2)
+        self.switch_screen(1)
 
     def switch_screen(self, screen_id: int):
         if self.current_scene:

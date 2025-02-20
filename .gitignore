@@ -1,1 +1,9 @@
+__pycache__
+.idea/
+.vscode/
+.Project Backup/
+*.pyc
+*.pyo
+*.pyd
+*.log
 *.workspace
