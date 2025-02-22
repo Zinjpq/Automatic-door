@@ -4,7 +4,7 @@ import math
 import cv2
 import numpy as np
 
-from main.DetectPlateImage import DetectChars, Preprocess, PossibleChar, PossiblePlate
+from src.DetectPlateImage import DetectChars, Preprocess, PossibleChar, PossiblePlate
 
 # module level variables ##########################################################################
 PLATE_WIDTH_PADDING_FACTOR = 1.3

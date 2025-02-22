@@ -4,7 +4,7 @@ import os
 import cv2
 import numpy as np
 
-from main.DetectPlateImage import Preprocess, PossibleChar
+from src.DetectPlateImage import Preprocess, PossibleChar
 
 # module level variables ##########################################################################
 

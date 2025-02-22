@@ -1,8 +1,8 @@
 from tkinter import Frame, Tk
 
-from main.Components import Widgets
-from main.Components.Widgets import AddLicensePlateText, ShowPlateImage, ButtonMoveCam
-from main.Constants.urls import CAMERA_URL
+from src.Components import Widgets
+from src.Components.Widgets import AddLicensePlateText, ShowPlateImage, ButtonMoveCam
+from src.Constants.urls import CAMERA_URL
 
 
 def AlarmButton():

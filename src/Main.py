@@ -1,6 +1,6 @@
 from tkinter import Tk
 
-from main.Components.AllBar import MainWindow
+from src.Components.AllBar import MainWindow
 
 
 if __name__ == "__main__":

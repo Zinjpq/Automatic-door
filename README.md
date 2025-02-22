@@ -12,6 +12,7 @@ Welcome to the Automatic Door System project! This project integrates **ESP32-CA
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Hardware Support](#hardware-support)
 - [Screenshots](#screenshots)
 - [Contributing](#contributing)
 - [License](#license)
@@ -20,17 +21,17 @@ Welcome to the Automatic Door System project! This project integrates **ESP32-CA
 
 ## Overview
 
-This project aims to build a smart automatic door system capable of recognizing license plates using **ESP32-CAM** and **OpenCV**. The system sends relevant data to a **NestJS**-powered web server, which processes the information and manages door control actions.
+This project aims to build a smart automatic door system capable of recognizing license plates using **ESP32-CAM** and **OpenCV**. The system provides a **Tkinter-based** desktop application for monitoring and controlling door access.
 
 This README is a work in progress, and the project is still under active development. Stay tuned for updates!
 
 ## Features
 
-- **License Plate Recognition**: Automatically detects and identifies vehicle license plates using the ESP32-CAM and OpenCV.
-- **Remote Control**: Control the door remotely through a web server powered by NestJS.
-- **Secure Access**: The door only opens for recognized license plates, providing secure access.
+- **License Plate Recognition**: Automatically detects and identifies vehicle license plates using ESP32-CAM and OpenCV.
+- **Local Desktop Application**: Uses a Tkinter-based GUI for easy monitoring and control.
+- **Secure Access**: The door only opens for recognized license plates, ensuring security.
 - **Customizable Actions**: Configurable actions such as door open/close timings and security features.
-- **Real-time Monitoring**: Monitor access logs in real-time via the web interface.
+- **Real-time Monitoring**: View access logs and system status via the desktop app.
 
 ## Installation
 
@@ -38,37 +39,26 @@ This README is a work in progress, and the project is still under active develop
 
 Make sure you have the following installed:
 
-- **Node.js** (v14 or higher)
-- **Python** (for OpenCV integration)
+- **Python** (for OpenCV and Tkinter)
 - **ESP32-CAM module**
 - **RFID module** (optional, for RFID-based access)
 
 ### Steps
 
-1. **Clone the repository**:
+1. **Download the latest release**:
+    Go to the [Releases](https://github.com/Zinjpq/AutomaticDoorSystem/releases) page and download the latest version of the application.
+
+2. **Extract the files**:
+    Extract the downloaded ZIP file to a folder on your system.
+
+3. **Run the application**:
+    Navigate to the extracted folder and run:
     ```bash
-    git clone https://github.com/your-username/project-name.git
+    python app.py
     ```
-2. **Navigate to the project directory**:
-    ```bash
-    cd project-name
-    ```
-3. **Install dependencies**:
-    For the web server:
-    ```bash
-    npm install
-    ```
-    For the OpenCV setup:
-    ```bash
-    pip install -r requirements.txt
-    ```
+
 4. **Setup ESP32-CAM**:
     Flash the appropriate firmware on the ESP32-CAM following [this guide](link-to-guide).
-
-5. **Start the web server**:
-    ```bash
-    npm run start
-    ```
 
 ## Usage
 
@@ -76,17 +66,17 @@ To run the project, follow these steps:
 
 1. Install dependencies:
     ```bash
-    npm install
+    pip install -r requirements.txt
     ```
 
-2. Start the web server:
+2. Run the Tkinter application:
     ```bash
-    npm run dev
+    python app.py
     ```
 
 3. Connect the ESP32-CAM to the system and ensure it's broadcasting video and capturing images for license plate recognition.
 
-4. Access the web interface at `http://localhost:3000` to monitor and control the door.
+4. Use the GUI to monitor and control the door.
 
 ### Example Commands
 
@@ -95,13 +85,23 @@ To run the project, follow these steps:
     python recognize_plate.py --image path/to/image
     ```
 
+## Hardware Support
+
+This project supports multiple microcontrollers for door control and automation:
+
+- **Arduino**
+- **Raspberry Pi**
+- **STM32**
+
+The corresponding schematics can be found in the `simulations/schematics/` directory.
+
 ## Screenshots
 
-Include screenshots here to give users a visual understanding of the project in action. (e.g., system dashboard, license plate recognition, door control).
+Include screenshots here to give users a visual understanding of the project in action (e.g., system dashboard, license plate recognition, door control).
 
-# Hang's Job
+## Hang's Job
 
-This project involves working with Arduino and ESP32 to control servos via UART signals and display messages on an LCD. The servos' positions will be saved in EEPROM to retain the state during power interruptions.
+This project involves working with Arduino, Raspberry Pi, and STM32 to control servos via UART signals and display messages on an LCD. The servos' positions will be saved in EEPROM to retain the state during power interruptions.
 
 ## Overview
 
@@ -115,38 +115,30 @@ The goal of this project is to:
 ## Tasks
 
 1. **Uploading Files to GitHub**:
-    - Ensure familiarity with GitHub and how to upload files using GitHub Desktop or the Git command line.
-    - Upload two files named `r3.ino` and `esp32.ino` into a folder called `Arduino` in the root directory of the repository.
+    - Upload `r3.ino`, `raspi.py`, and `stm32.c` into a folder called `Firmware` in the root directory.
 
 2. **File Requirements**:
-    - **`r3.ino`**:
-        - Read UART signals, specifically the characters `1` and `2`.
-        - If the UART signal is `1`, rotate one servo by 90 degrees.
-        - If the UART signal is `2`, rotate two servos by 90 degrees.
-        - The servo speed should be adjustable via a variable at the beginning of the file.
-        - After 15 seconds, the servo(s) should return to 0 degrees unless blocked by an infrared sensor. This feature can be implemented using a timer.
-        - Display the following messages on the LCD1602A (with I2C interface):
-            - "Open the left door" when one servo is active.
-            - "Open 2 doors" when both servos are active.
-        - Save the angles of both servos to EEPROM so that if power is lost and restored, the servos will continue from their last positions.
+    - **`r3.ino`** (Arduino):
+        - Read UART signals (`1` and `2`).
+        - Control servos based on UART input.
+        - Display messages on the LCD1602A (with I2C interface).
+        - Save servo positions to EEPROM.
+    
+    - **`raspi.py`** (Raspberry Pi):
+        - Handle UART communication and control GPIO pins.
+        - Integrate with the main system to manage door control.
 
-    - **`esp32.ino`**:
-        - Create a function to send UART signals with the characters `1` and `2`.
+    - **`stm32.c`** (STM32):
+        - Implement UART signal handling and servo control logic.
 
-## Useful Resources
-
-- [GitHub Tutorial](https://www.youtube.com/playlist?list=PLQH9LiOP43c33JLu6VYLFyLNS4xCM7RwM) — A helpful playlist for getting started with GitHub and recommending use GitHub Desktop.
-- [Arduino Components and Libraries](https://youtube.com/playlist?list=PLQH9LiOP43c0PZqBtf1zBjtphZnkln0AN&si=o8JU_rhS4OZeefNO) — Understand how to use Arduino components and libraries.
-- [UART](https://www.programmingboss.com/2021/04/esp32-arduino-serial-communication-with-code.html#gsc.tab=0) - This is almost done, just find a way to send it back.
 ## Timeline
 
 ![Timeline](Images/timeline_with_H.png)
 
-In this section, we will document the progress and task completion status for Hang:
-- [x] This is an example
+Task completion status for Hang:
 - [x] Learn how to upload files to GitHub.
-- [x] Upload `r3.ino` and `esp32.ino` to the `Arduino` folder in the root directory.
-- [ ] Implement UART signal handling in `r3.ino`.
+- [x] Upload `r3.ino`, `raspi.py`, and `stm32.c` to the `Firmware` folder.
+- [ ] Implement UART signal handling in `r3.ino`, `raspi.py`, and `stm32.c`.
 - [ ] Implement servo control based on UART input.
 - [x] Add LCD1602A display logic.
 - [x] Save servo positions to EEPROM.
@@ -154,15 +146,6 @@ In this section, we will document the progress and task completion status for Ha
 - [ ] Create UART signal sending function in `esp32.ino`.
 - [ ] Check all above.
 
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository.
-2. Create a new feature branch (`git checkout -b feature-name`).
-3. Commit your changes (`git commit -m 'Add new feature'`).
-4. Push to the branch (`git push origin feature-name`).
-5. Open a pull request.
 
 ## License
 
@@ -174,5 +157,3 @@ For any inquiries, please reach out to:
 
 - **Your Name**: [quangvinh07032003@gmail.com](mailto:quangvinh07032003@gmail.com)
 - **GitHub**: [Zinjpq](https://github.com/Zinjpq)
-
----

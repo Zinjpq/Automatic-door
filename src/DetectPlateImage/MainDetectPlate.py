@@ -3,7 +3,7 @@ import os
 import time
 import cv2
 
-from main.DetectPlateImage import DetectPlates, DetectChars
+from src.DetectPlateImage import DetectPlates, DetectChars
 
 # Biến lưu trữ biển số và thời gian lưu
 last_saved_plates = {}
