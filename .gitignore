@@ -7,3 +7,7 @@ __pycache__
 *.pyd
 *.log
 *.workspace
+src/plate.txt
+simulations/Project Backups/Audo \[Autosaved\].pdsprj
+/simulations/Project Backups
+/firmware/Stm32/Debug
