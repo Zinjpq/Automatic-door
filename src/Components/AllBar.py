@@ -53,7 +53,7 @@ class HomeScene(BaseScene):
             color="#000000"  # Màu chữ
         )
 
-        self.livestream = Widgets.LivestreamWidget(self, CAMERA_URL)
+        self.livestream = Widgets.LivestreamWidget(self,use_local_camera=True)
         self.livestream.place(x=268 - 256, y=136)
         # folder =
         # AutoUpdateLicensePlateScene(self, parent, folder)
@@ -97,7 +97,7 @@ class CamControlScene(BaseScene):
         )
 
         # Library.add_image("image_Cameraerror.png", parent=self, x=268-256, y=136)
-        self.livestream = Widgets.LivestreamWidget(self, CAMERA_URL)
+        self.livestream = Widgets.LivestreamWidget(self, use_local_camera=True)
         self.livestream.place(x=268 - 256, y=136)
         buttons = [
             ("button_up.png", lambda: ButtonMoveCam("up"), 1045, 196),

@@ -20,9 +20,10 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 class LivestreamWidget(Frame):
-    def __init__(self, parent, camera_url):
+    def __init__(self, parent, camera_url=None, use_local_camera=False):
         super().__init__(parent, bg="#000000", width=640, height=480)
         self.camera_url = camera_url
+        self.use_local_camera = use_local_camera
         self.canvas = Canvas(self, bg="#000000", width=640, height=480, highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
 
@@ -36,36 +37,76 @@ class LivestreamWidget(Frame):
         threading.Thread(target=self.stream_video, daemon=True).start()
 
     def stream_video(self):
-        while self.running:
-            try:
-                start_time = time.time()
+        if self.use_local_camera:
+            cap = cv2.VideoCapture(1)
 
-                # Tải ảnh từ camera
-                img_resp = requests.get(self.camera_url, timeout=2)
-                img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
-                frame = cv2.imdecode(img_arr, cv2.IMREAD_COLOR)
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            if not cap.isOpened():
+                print("Không thể mở camera!")
+                return
+            while self.running:
+                try:
+                    start_time = time.time()
 
-                FrameWithPlates, plate_images  = detect_license_plate(frame)
-                Detect_License_Plate(frame)
-                FrameWithPlates = cv2.resize(FrameWithPlates, (640,480))
+                    ret, frame = cap.read()
+                    if not ret:
+                        raise Exception("Không thể đọc khung hình từ camera!")
 
-                # Resize để giảm tải hệ thống
-                frame = cv2.resize(FrameWithPlates, (640, 480))
-                img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    FrameWithPlates, plate_images = detect_license_plate(frame)
+                    Detect_License_Plate(frame)
+                    FrameWithPlates = cv2.resize(FrameWithPlates, (640, 480))
 
-                # Chuyển ảnh thành PhotoImage
-                photo = ImageTk.PhotoImage(image=Image.fromarray(img))
+                    # Chuyển ảnh thành PhotoImage
+                    img = cv2.cvtColor(FrameWithPlates, cv2.COLOR_BGR2RGB)
+                    photo = ImageTk.PhotoImage(image=Image.fromarray(img))
 
-                # Cập nhật Canvas trong main thread
-                self.canvas.after(0, self.update_canvas, photo)
-                self.error_label.lower()
+                    # Cập nhật Canvas trong main thread
+                    self.canvas.after(0, self.update_canvas, photo)
+                    self.error_label.lower()
 
-                # Giới hạn FPS (khoảng 10-15 FPS)
-                elapsed = time.time() - start_time
-                time.sleep(max(0.1 - elapsed, 0))  # Tối thiểu 100ms giữa các khung hình
+                    # Giới hạn FPS (khoảng 10-15 FPS)
+                    elapsed = time.time() - start_time
+                    time.sleep(max(0.1 - elapsed, 0))
 
-            except Exception:
-                self.canvas.after(0, self.show_camera_error)
+                except Exception:
+                    self.canvas.after(0, self.show_camera_error)
+
+            cap.release()  # Giải phóng camera khi kết thúc
+
+        else:
+            # Tải ảnh từ URL
+            while self.running:
+                try:
+                    start_time = time.time()
+
+                    img_resp = requests.get(self.camera_url, timeout=2)
+                    img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
+                    frame = cv2.imdecode(img_arr, cv2.IMREAD_COLOR)
+
+                    FrameWithPlates, plate_images = detect_license_plate(frame)
+                    Detect_License_Plate(frame)
+                    FrameWithPlates = cv2.resize(FrameWithPlates, (640, 480))
+
+                    # Resize để giảm tải hệ thống
+                    frame = cv2.resize(FrameWithPlates, (640, 480))
+                    img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+                    # Chuyển ảnh thành PhotoImage
+                    photo = ImageTk.PhotoImage(image=Image.fromarray(img))
+
+                    # Cập nhật Canvas trong main thread
+                    self.canvas.after(0, self.update_canvas, photo)
+                    self.error_label.lower()
+
+                    # Giới hạn FPS (khoảng 10-15 FPS)
+                    elapsed = time.time() - start_time
+                    time.sleep(max(0.1 - elapsed, 0))
+
+                except Exception:
+                    self.canvas.after(0, self.show_camera_error)
+
+
 
     def update_canvas(self, photo):
         self.canvas.create_image(0, 0, anchor="nw", image=photo)
