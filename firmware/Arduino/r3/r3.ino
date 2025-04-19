@@ -1,101 +1,213 @@
-#include <EEPROM.h>
+// Cau hinh cho RFID
 #include <SPI.h>
 #include <MFRC522.h>
-#include <Servo.h> 
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-
-// Constants and object definitions
-#define RST_PIN 9
 #define SS_PIN 10
-#define SERVO_OPEN_ANGLE 90
-#define SERVO_CLOSED_ANGLE 0
-#define DELAY_TIME 15000
+#define RST_PIN 9
+// SPI MOSI  11
+// SPI MISO  12
+// SPI SCK   13
+MFRC522 rfid(SS_PIN, RST_PIN);
+// Init array that will store new NUID 
+byte nuidPICC[4];
+//////////////////////////////////////////////////
+// Cau hinh servo
+#include "Servo.h"
+#define SERVOPAN_PIN 5
+#define SERVOTILT_PIN 6
+#define SERVO360_PIN 3
+Servo panservo, tiltservo, servo360;
+int pan = 90;
+int tilt = 50;
+int time = 12;
+//////////////////////////////////////////////////
+// Cau hinh LCD1602A
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x3F,16,2);
+// SDA A4
+// SCL A5
+//////////////////////////////////////////////////
+// Cau hinh cam bien hong ngoai
+#define infraredsensor 1
+// Cam bien hanh trinh
+#define positionsensor1 A0  // Cam bien khi dong 
+#define positionsensor1 A1  // Cam bien khi mo
+//////////////////////////////////////////////////
+String uartBuffer = "";
+//////////////////////////////////////////////////
+// Cau hinh chan UART 
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-MFRC522 mfrc522(SS_PIN, RST_PIN);
-Servo servo1, servo2;
+//////////////////////////////////////////////////
+#include <Arduino_FreeRTOS.h>
+#include <task.h>
+// Biến dùng để truyền lệnh vào task
+String receivedCommand = "";
+bool newCommandAvailable = false;
 
-int diachi_1 = 1, diachi_2 = 5;
-
-//Sensor
-int sensorPin = 2;
-
-//RFID
-int RFIDval = 0;
-int UID[4];
-
-//ID 
-const int ID1[4] = {35, 115, 238, 47};
-const int ID2[4] = {163, 131, 13, 20};
-
-// Setup function
 void setup() {
   Serial.begin(9600);
-  SPI.begin();
-  mfrc522.PCD_Init();
-  
-  pinMode(sensorPin, INPUT);
-  servo1.attach(5);
-  servo2.attach(6);
-  
+  //////////////////////////////////////////////////
+  SPI.begin(); // Init SPI bus
+  rfid.PCD_Init(); // Init MFRC522
+  //////////////////////////////////////////////////
+  panservo.attach(SERVOPAN_PIN);  // ngang
+  tiltservo.attach(SERVOTILT_PIN); // doc
+  servo360.attach(SERVO360_PIN);
+  panservo.write(pan);
+  tiltservo.write(tilt);
+  servo360.write(90);
+  //////////////////////////////////////////////////
+  // Cau hinh chan cam bien
+  pinMode(sensor,INPUT);
+  pinMode(hanhTrinhSensorPin, INPUT);
+  pinMode(infraredsensor, INPUT);
+  //////////////////////////////////////////////////
+  // Cau hinh LCD
   lcd.init();
-  lcd.backlight();
+  //////////////////////////////////////////////////
+  // Cau hinh FreeRTOS
+  while (!Serial) 
+  {
+    ; // wait for serial port to connect.
+  }
+  xTaskCreate(opendoorTask, "OpenDoorTask", 2048, NULL, 1, NULL);
 }
 
-// Function to check RFID
-void checkRFID(){
-  if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) return;
-  
-  for (byte i = 0; i < mfrc522.uid.size; i++) UID[i] = mfrc522.uid.uidByte[i];
-  
-  RFIDval = (memcmp(UID, ID1, 4) == 0) ? 1 : (memcmp(UID, ID2, 4) == 0) ? 2 : -1;
-  mfrc522.PICC_HaltA();
-  mfrc522.PCD_StopCrypto1();
+static void opendoorTask(void *parameter) {
+  for (;;) {
+    // Chờ đến khi có lệnh mới
+    if (newCommandAvailable && receivedCommand == "open") {
+      newCommandAvailable = false;
+
+      // Bắt đầu mở cửa
+      servo360.write(180);
+
+      // Đợi đến khi cảm biến hành trình được kích hoạt2
+      while (digitalRead(hanhTrinhSensorPin) == LOW) {
+        vTaskDelay(10 / portTICK_PERIOD_MS);  // Delay nhẹ để không chiếm CPU
+      }
+
+      // Dừng servo
+      servo360.write(90);
+      vTaskDelay(12000 / portTICK_PERIOD_MS);  // Dừng 12 giây
+
+      // Gửi tín hiệu UART báo cửa đã mở
+      Serial.println("CUA_DA_MO");
+
+      // Kiểm tra cảm biến hồng ngoại
+      if (digitalRead(infraredsensor) == HIGH) {
+        // Có vật cản -> quay ngược lại để mở lại cửa
+        servo360.write(180);
+        vTaskDelay(6000 / portTICK_PERIOD_MS);
+
+        // Sau đó đóng cửa lại
+        servo360.write(0);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+        // Gửi tín hiệu UART báo cửa đã đóng
+        Serial.println("CUA_DA_DONG");
+      } else {
+        // Không có vật cản -> đóng cửa bình thường
+        servo360.write(0);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+        // Gửi tín hiệu UART báo cửa đã đóng
+        Serial.println("CUA_DA_DONG");
+      }
+    }
+
+    vTaskDelay(100 / portTICK_PERIOD_MS);  // Kiểm tra lệnh mỗi 100ms
+  }
 }
 
-// Function to open servos and display message
-void openDoor(int mode){
-  const char* message = (mode == 1) ? "the left door" : "2 doors";
-  Serial.print("Open "); Serial.println(message);
-  
-  lcd.clear();
-  lcd.setCursor(1, 0);
-  lcd.print("Open");
-  lcd.setCursor(3, 1);
-  lcd.print(message);
-  
-  servo1.write(SERVO_OPEN_ANGLE);
-  if (mode == 2) servo2.write(SERVO_OPEN_ANGLE);
+void controlpantilt(){
+  if (0 <= pan,tilt<= 180){
+    return;
+  }
+  else if(move==){
 
-  saveServoPositions();
-  delay(DELAY_TIME);
+  }
+
 }
 
-// Save servo positions to EEPROM
-void saveServoPositions(){
-  EEPROM.write(diachi_1, servo1.read());
-  EEPROM.write(diachi_2, servo2.read());
+// void opendoor(string cmd){
+//   if cmd == "open"
+//   then servo360.write(180) // mở cửa
+//   khi chạm cảm biến hành trình thì 
+//   servo360.write(90) 
+//   dừng lại 12s
+//   và gửi tín hiệu uart đến esp32 là cửa đã mở 
+//   sau đó đóng cửa 
+//   servo360.write(0)
+//   nếu cảm biến hồng ngoại phát hiện vật cản lên 1 thì lập tức quay chiều servo360 độ
+//   Serial.println(digitalRead(sensor));  
+//   servo360.write(180) // mở cửa
+//   và đợi tiếp 6s thì đóng 
+//   nếu đóng được thì gửi tín hiệu uart là cửa đã đóng.  
+// }
+
+void opendoor(String cmd) {
+  if (cmd == "open") {
+    // Bắt đầu mở cửa
+    servo360.write(180);
+    
+    // Đợi đến khi cảm biến hành trình được kích hoạt (giả sử trạng thái HIGH)
+    while (digitalRead(hanhTrinhSensorPin) == LOW);
+
+    // Dừng servo
+    servo360.write(90);
+    delay(12000);  // Dừng lại 12s
+
+    // Gửi tín hiệu UART báo cửa đã mở
+    Serial.println("CUA_DA_MO");
+
+    // Kiểm tra cảm biến hồng ngoại
+    if (digitalRead(infraredsensor) == HIGH) {
+      // Có vật cản -> quay ngược lại để mở lại cửa
+      servo360.write(180);
+      delay(6000); // Đợi 6s
+
+      // Sau đó đóng cửa lại
+      servo360.write(0);
+      delay(2000); // Thời gian cần để đóng cửa hoàn toàn
+
+      // Gửi tín hiệu UART báo cửa đã đóng
+      Serial.println("CUA_DA_DONG");
+    } else {
+      // Không có vật cản -> đóng cửa bình thường
+      servo360.write(0);
+      delay(2000);  // Thời gian cần để đóng cửa hoàn toàn
+
+      // Gửi tín hiệu UART báo cửa đã đóng
+      Serial.println("CUA_DA_DONG");
+    }
+  }
+}
+void parseCommand(String cmd) {
+  if (cmd[0] != '#') return;
+  cmd = cmd.substring(1, cmd.length() - 1); // remove '#' and ';'
+
+  int firstComma = cmd.indexOf(',');
+  int secondComma = cmd.indexOf(',', firstComma + 1);
+
+  int pan = cmd.substring(0, firstComma).toInt();
+  int tilt = cmd.substring(firstComma + 1, secondComma).toInt();
+  String servo360Cmd = cmd.substring(secondComma + 1);
+
+  panServo.write(pan);
+  tiltServo.write(tilt);
+
+  
 }
 
-// Main loop function
 void loop(){
-  checkRFID();
-
-  if (RFIDval > 0) openDoor(RFIDval);
-  else if (RFIDval == -1) {
-    Serial.println("Invalid card");
-    lcd.clear();
-    lcd.setCursor(1, 0);
-    lcd.print("Invalid card");
-    RFIDval = 0;
+  while (Serial.available()) {
+    char c = Serial.read();
+    uartBuffer += c;
+    if (c == ';') {
+      parseCommand(uartBuffer);
+      uartBuffer = "";
+    }
   }
-
-  if (RFIDval != 0 && digitalRead(sensorPin) == LOW) {
-    lcd.clear();
-    servo1.write(SERVO_CLOSED_ANGLE);
-    servo2.write(SERVO_CLOSED_ANGLE);
-    saveServoPositions();
-    RFIDval = 0;
-  }
+  controlpantilt();
 }
