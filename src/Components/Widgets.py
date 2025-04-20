@@ -11,7 +11,6 @@ import numpy as np
 import requests
 from PIL import Image, ImageTk
 
-from src.Constants.urls import RasPi_Base_URL
 from src.DetectPlateImage.MainDetectPlate import Detect_License_Plate
 
 
