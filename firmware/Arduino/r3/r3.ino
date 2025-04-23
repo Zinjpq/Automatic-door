@@ -22,13 +22,6 @@ int pan = 90;
 int tilt = 50;
 int time = 12;
 ////////////////////////////////////////////////////////////
-// Cau hinh LCD1602A
-#include <Wire.h> 
-#include <LiquidCrystal_I2C.h>
-LiquidCrystal_I2C lcd(0x3F,16,2);
-// SDA A4
-// SCL A5
-////////////////////////////////////////////////////////////
 // Cau hinh cam bien hong ngoai
 #define infraredsensor 1
 // Cam bien hanh trinh
@@ -48,7 +41,6 @@ bool newCommandAvailable = false;
 
 
 void setup() {
-  // UART 
   Serial.begin(9600);
   ////////////////////////////////////////////////////////////
   // RFID
@@ -69,7 +61,7 @@ void setup() {
   pinMode(positionsensor1, INPUT);
   ////////////////////////////////////////////////////////////
   // Cau hinh LCD
-  lcd.init();
+  // lcd.init();
   ////////////////////////////////////////////////////////////
   while (!Serial) 
   {
@@ -143,16 +135,6 @@ static void opendoorTask(void *parameter) {
   }
 }
 
-void controlpantilt(){
-  if (0 <= pan,tilt<= 180){
-    return;
-  }
-  else if(move==){
-
-  }
-
-}
-
 void parseCommand(String cmd) {
   if (cmd[0] != '#') return;
   cmd = cmd.substring(1, cmd.length() - 1); // remove '#' and ';'
@@ -176,10 +158,10 @@ void loop(){
     String cmd = Serial.readStringUntil('\n');
     cmd.trim();
 
-    if (cmd == "open") {
-      receivedCommand = cmd;
-      newCommandAvailable = true;
-    }
+    Serial.println("Received: " + command);
+
+    Serial.println("DOOR_STATE:OPEN"); // hoặc CLOSED
+
   }
 
 

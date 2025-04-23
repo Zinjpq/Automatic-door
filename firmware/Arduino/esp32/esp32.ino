@@ -24,7 +24,7 @@
     if (!WiFi.config(local_IP, gateway, subnet)) {
       Serial.println("Static IP configuration failed.");
     }
-    WiFi.begin("ESP32-Access Point", "12345678"); 
+    WiFi.begin("ESP32-Access Point", "12345678");
     // Setup server routes
     server.on("/cam", handleImage);
     server.begin();
@@ -39,40 +39,71 @@
   // Code for Esp32
   #include <WiFi.h>
   #include <WebServer.h>
-  #include <HTTPClient.h>
-
+  // #include <HTTPClient.h>
   WebServer server(80);
-  HardwareSerial mySerial(1);
+  ////////////////////////////////////////////////////////////
+  HardwareSerial UnoSerial(1);
+  ////////////////////////////////////////////////////////////
+  String doorStatusFromUNO = "UNKNOWN"; // trạng thái nhận từ UNO
+  ////////////////////////////////////////////////////////////
+  #include <LiquidCrystal_I2C.h>
+  LiquidCrystal_I2C lcd(0x27, 16, 2);  
 
   void setup() {
     Serial.begin(115200);
-    setup_access_point();
     WiFi.softAP("ESP32-Access Point", "12345678");
-    server.begin();
+    ////////////////////////////////////////////////////////////
+    // khoi tao lcd i2c
+    lcd.init();
+    lcd.backlight();
+    ////////////////////////////////////////////////////////////
     UnoSerial.begin(9600, SERIAL_8N1, 16, 17);
+    ////////////////////////////////////////////////////////////
+    // server set angle + door status
+    server.on("/set_angle", []() {
+      if (server.hasArg("pan") && server.hasArg("tilt")&& server.hasArg("door")) {
+        // Khai bao 
+        int pan = server.arg("pan").toInt();
+        int tilt = server.arg("tilt").toInt();
+        int door = server.arg("door").toInt();
+        // Gui xuong Uno
+        String command = "PAN:" + String(pan) + ",TILT:" + String(tilt) + ",DOOR:" + String(door);
+        UnoSerial.println(command);
+        // Check lai
+        // Serial.println("Received pan: " + String(pan) + ", tilt: " + String(tilt) + ", door: " + String(door));
+        
+        // test bang lcd
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.println("pan: " + String(pan) + ", tilt: " + String(tilt));
+        lcd.setCursor(0, 1);
+        lcd.println(", door: " + String(door));
 
+        server.send(200, "text/plain", "OK");
+      } else {
+        server.send(400, "text/plain", "Missing parameters");
+      }
+    });
+    // server door status
+    server.on("/door_status", []() {
+      server.send(200, "text/plain", "Door status: " + doorStatusFromUNO);
+    });
+    server.begin();
   }
 
   void loop() {
     server.handleClient(); // Handle incoming client requests
 
-
-
-    //Khi nhan duoc tin hieu tu uno 
+    // Nhận dữ liệu từ UNO R3
     if (UnoSerial.available()) {
-      String received = UnoSerial.readStringUntil('\n');
-      sendDoorStatus(received);
-      // doan nay them cua dang dong hoac da dong 
+      String incoming = Serial2.readStringUntil('\n');
+      incoming.trim();
+
+      if (incoming.startsWith("DOOR_STATE:")) {
+        doorStatusFromUNO = incoming.substring(strlen("DOOR_STATE:"));
+        Serial.println("Received from UNO: " + doorStatusFromUNO);
+      }
     }
   }
 
-  void sendDoorStatus(String status) {
-    HTTPClient http;
-    http.begin("http://192.168.4.184:5000/door_status");
-    http.addHeader("Content-Type", "application/json");
-    String json = "{\"status\":\"" + status + "\"}";
-    int httpResponseCode = http.POST(json);
-    http.end();
-  }
-}
 #endif
