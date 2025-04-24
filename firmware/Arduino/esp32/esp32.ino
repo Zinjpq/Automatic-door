@@ -68,16 +68,17 @@
         int door = server.arg("door").toInt();
         // Gui xuong Uno
         String command = "PAN:" + String(pan) + ",TILT:" + String(tilt) + ",DOOR:" + String(door);
+        ////// PAN:90,TILT:90,DOOR:1
         UnoSerial.println(command);
         // Check lai
         // Serial.println("Received pan: " + String(pan) + ", tilt: " + String(tilt) + ", door: " + String(door));
         
         // test bang lcd
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.println("pan: " + String(pan) + ", tilt: " + String(tilt));
-        lcd.setCursor(0, 1);
-        lcd.println(", door: " + String(door));
+        // lcd.clear();
+        // lcd.setCursor(0, 0);
+        // lcd.println("pan: " + String(pan) + ", tilt: " + String(tilt));
+        // lcd.setCursor(0, 1);
+        // lcd.println(", door: " + String(door));
 
         server.send(200, "text/plain", "OK");
       } else {
@@ -101,8 +102,17 @@
 
       if (incoming.startsWith("DOOR_STATE:")) {
         doorStatusFromUNO = incoming.substring(strlen("DOOR_STATE:"));
-        Serial.println("Received from UNO: " + doorStatusFromUNO);
+        // Serial.println("Received from UNO: " + doorStatusFromUNO);
       }
+    }
+    if(doorStatusFromUNO == "OPEN"){
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Cửa mở");
+    } else if(doorStatusFromUNO == "CLOSED"){
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Cửa đóng");
     }
   }
 
