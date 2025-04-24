@@ -8,10 +8,12 @@
 
 ## Esp32
 - [x] uart với uno
-- [ ] in ra man hinh status cua cua
+- [x] in ra man hinh status cua cua
 ---
 ## Uno
 - [ ] tiệm cận
 - [ ] đóng mở cổng
-- [ ] điều khiển servo pan tilt từ thông số gửi về từ esp32
+- [x] điều khiển servo pan tilt từ thông số gửi về từ esp32
+- [ ] đọc từ rfid
+- [ ] 
 ---
