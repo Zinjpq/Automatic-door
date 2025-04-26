@@ -21,13 +21,13 @@ void serveJpg() {
 
 void handleImage() {
   if (!esp32cam::Camera.changeResolution(hiRes)) {
-    Serial.println("CAMERA FAIL");
+    // Serial.println("CAMERA FAIL");
   }
   serveJpg();
 }
 
 void setup_cam() {
-  Serial.println();
+  // Serial.println();
   using namespace esp32cam;
   Config cfg;
   cfg.setPins(pins::AiThinker);
@@ -36,5 +36,5 @@ void setup_cam() {
   cfg.setJpeg(80);
 
   bool ok = Camera.begin(cfg);
-  Serial.println(ok ? "CAMERA OK" : "CAMERA FAIL");
+  // Serial.println(ok ? "CAMERA OK" : "CAMERA FAIL");
 }

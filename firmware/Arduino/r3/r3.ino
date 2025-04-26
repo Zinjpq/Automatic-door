@@ -10,36 +10,34 @@
 // SCK   13
 MFRC522 rfid(SS_PIN, RST_PIN);
 // Init array that will store new NUID 
-byte nuidPICC[4];
+String validCards[] = {
+  "A3 83 0D 14",
+  "23 73 EE 2F"
+};
 ////////////////////////////////////////////////////////////
 // Cau hinh servo
 #include "Servo.h"
-#define SERVOPAN_PIN 5
-#define SERVOTILT_PIN 6
 #define SERVO360_PIN 3
-Servo panservo, tiltservo, servo360;
-int pan = 90;
-int tilt = 50;
-int time = 12;
+Servo servo360;
+enum DoorState { CLOSED, OPEN };
+DoorState doorState = CLOSED;
+bool isOpening = false;
 ////////////////////////////////////////////////////////////
 // Cau hinh cam bien hong ngoai
-#define infraredsensor 1
+#define infraredsensor A2 
 // Cam bien hanh trinh
-#define positionsensor0 A0  // Cam bien khi dong 
-#define positionsensor1 A1  // Cam bien khi mo
+#define positionsensorClose A0  // Cam bien khi dong 
+#define positionsensorOpen A1  // Cam bien khi mo
 ////////////////////////////////////////////////////////////
 // Cau hinh cho UART 
 #include <Arduino.h>
 String uartBuffer = "";
 ////////////////////////////////////////////////////////////
-// Cau hinh cho FreeRTOS
-#include <Arduino_FreeRTOS.h>
-#include <task.h>
-// Biến dùng để truyền lệnh vào task
-String receivedCommand = "";
-bool newCommandAvailable = false;
-
-
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+// SDA A4
+// SCL A5
+ 
 void setup() {
   Serial.begin(9600);
   ////////////////////////////////////////////////////////////
@@ -48,130 +46,124 @@ void setup() {
   rfid.PCD_Init(); // Init MFRC522
   ////////////////////////////////////////////////////////////
   // Setup servo
-  panservo.attach(SERVOPAN_PIN);  // ngang
-  tiltservo.attach(SERVOTILT_PIN); // doc
   servo360.attach(SERVO360_PIN);
-  panservo.write(pan);
-  tiltservo.write(tilt);
-  servo360.write(90);
   ////////////////////////////////////////////////////////////
   // Cau hinh chan cam bien
   pinMode(infraredsensor, INPUT);
-  pinMode(positionsensor0,INPUT);
-  pinMode(positionsensor1, INPUT);
+  pinMode(positionsensorClose,INPUT_PULLUP);
+  pinMode(positionsensorOpen, INPUT_PULLUP);
   ////////////////////////////////////////////////////////////
-  // Cau hinh LCD
-  // lcd.init();
+  // khoi tao lcd i2c
+  lcd.init();
+  lcd.backlight();
   ////////////////////////////////////////////////////////////
-  while (!Serial) 
-  {
-    ; // wait for serial port to connect.
+  // Quay servo để đóng cửa đến khi chạm cảm biến hành trình đóng
+  Serial.println("Initializing: Closing door...");
+  lcd.setCursor(0, 0);
+  lcd.print("Closing...");
+  servo360.write(70);
+  // Chờ đến khi cảm biến đóng bị kích hoạt
+  while (digitalRead(positionsensorClose) == HIGH) {
+    // Đợi cho đến khi cửa đóng hoàn toàn
   }
-  // Cau hinh FreeRTOS
-  xTaskCreate(opendoorTask, "OpenDoorTask", 2048, NULL, 1, NULL);
+  // Dừng servo
+  servo360.write(90); // 90 là điểm dừng cho servo 360 độ
+  delay(500); // Cho servo ổn định
+  // Cập nhật trạng thái cửa
+  doorState = CLOSED;
+  Serial.println("DOOR_STATE: CLOSED");
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Door closed");
 }
 
-//idea
-// void opendoor(string cmd){
-//   if cmd == "open"
-//   then servo360.write(180) // mở cửa
-//   khi chạm cảm biến hành trình thì 
-//   servo360.write(90) 
-//   dừng lại 12s
-//   và gửi tín hiệu uart đến esp32 là cửa đã mở 
-//   sau đó đóng cửa 
-//   servo360.write(0)
-//   nếu cảm biến hồng ngoại phát hiện vật cản lên 1 thì lập tức quay chiều servo360 độ
-//   Serial.println(digitalRead(sensor));  
-//   servo360.write(180) // mở cửa
-//   và đợi tiếp 6s thì đóng 
-//   nếu đóng được thì gửi tín hiệu uart là cửa đã đóng.  
-// }
+void loop() {
+  if (!rfid.PICC_IsNewCardPresent()) return;
+  if (!rfid.PICC_ReadCardSerial()) return;
+  String uidStr = getCardUID(rfid.uid);
+  Serial.print("Đã quét thẻ: ");
+  Serial.println(uidStr);
 
-static void opendoorTask(void *parameter) {
-  for (;;) {
-    // Chờ đến khi có lệnh mới
-    if (newCommandAvailable && receivedCommand == "open") {
-      newCommandAvailable = false;
-
-      // Bắt đầu mở cửa
-      servo360.write(180);
-
-      // Đợi đến khi cảm biến hành trình được kích hoạt2
-      while (digitalRead(hanhTrinhSensorPin) == LOW) {
-        vTaskDelay(10 / portTICK_PERIOD_MS);  // Delay nhẹ để không chiếm CPU
-      }
-
-      // Dừng servo
-      servo360.write(90);
-      vTaskDelay(12000 / portTICK_PERIOD_MS);  // Dừng 12 giây
-
-      // Gửi tín hiệu UART báo cửa đã mở
-      Serial.println("CUA_DA_MO");
-
-      // Kiểm tra cảm biến hồng ngoại
-      if (digitalRead(infraredsensor) == HIGH) {
-        // Có vật cản -> quay ngược lại để mở lại cửa
-        servo360.write(180);
-        vTaskDelay(6000 / portTICK_PERIOD_MS);
-
-        // Sau đó đóng cửa lại
-        servo360.write(0);
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
-
-        // Gửi tín hiệu UART báo cửa đã đóng
-        Serial.println("CUA_DA_DONG");
-      } else {
-        // Không có vật cản -> đóng cửa bình thường
-        servo360.write(0);
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
-
-        // Gửi tín hiệu UART báo cửa đã đóng
-        Serial.println("CUA_DA_DONG");
-      }
-    }
-
-    vTaskDelay(100 / portTICK_PERIOD_MS);  // Kiểm tra lệnh mỗi 100ms
+  if (isValidCard(uidStr) && !isOpening && doorState == CLOSED){
+      Serial.println("Thẻ hợp lệ! Gửi lệnh mở cửa.");
+      isOpening = true;
+      openDoor();
+      delay(6000);
+      closeDoorWithIRCheck();
+      isOpening = false;
   }
-}
-
-void parseCommand(String cmd) {
-  if (cmd[0] != '#') return;
-  cmd = cmd.substring(1, cmd.length() - 1); // remove '#' and ';'
-
-  int firstComma = cmd.indexOf(',');
-  int secondComma = cmd.indexOf(',', firstComma + 1);
-
-  int pan = cmd.substring(0, firstComma).toInt();
-  int tilt = cmd.substring(firstComma + 1, secondComma).toInt();
-  String servo360Cmd = cmd.substring(secondComma + 1);
-
-  panServo.write(pan);
-  tiltServo.write(tilt);
-
   
-}
-
-void loop(){
-  // luu bien cap nhat thong tin va gui lai thong tin 
   if (Serial.available()) {
-    String cmd = Serial.readStringUntil('\n');
-    cmd.trim();
-
-    Serial.println("Received: " + command);
-
-    Serial.println("DOOR_STATE:OPEN"); // hoặc CLOSED
-
-  }
-
-
-  while (Serial.available()) {
-    char c = Serial.read();
-    uartBuffer += c;
-    if (c == ';') {
-      parseCommand(uartBuffer);
-      uartBuffer = "";
+    char command = Serial.read();
+    if (command == 'o' && !isOpening && doorState == CLOSED) {
+      isOpening = true;
+      openDoor();
+      delay(6000);
+      closeDoorWithIRCheck();
+      isOpening = false;
+      command = 'b';
     }
   }
-  controlpantilt();
+
+  rfid.PICC_HaltA();
+  rfid.PCD_StopCrypto1();
+}
+
+void openDoor() {
+  lcd.clear();
+  lcd.print("Opening...");
+  servo360.write(110); // quay mở
+
+  while (digitalRead(positionsensorOpen) == HIGH) {
+    delay(10); // chờ đến khi chạm công tắc mở
+  }
+
+  servo360.write(90); // dừng
+  lcd.clear();
+  lcd.print("Door opened");
+  doorState = OPEN;
+  Serial.println("DOOR_STATE: OPEN");
+}
+
+void closeDoorWithIRCheck() {
+  lcd.clear();
+  lcd.print("Closing...");
+  servo360.write(70); // quay đóng
+
+  while (digitalRead(positionsensorClose) == HIGH) {
+    if (digitalRead(infraredsensor) == LOW) {
+      lcd.clear();
+      lcd.print("Obstacle!");
+      openDoor();           // mở lại
+      delay(3000);          // đợi 3s
+      lcd.clear();
+      lcd.print("Retry close");
+      servo360.write(70);      // thử đóng lại
+    }
+    delay(10);
+  }
+
+  servo360.write(90); // dừng
+  lcd.clear();
+  lcd.print("Door closed");
+  doorState = CLOSED;
+  Serial.println("DOOR_STATE: CLOSED");
+}
+
+String getCardUID(MFRC522::Uid uid) {
+  String uidStr = "";
+  for (byte i = 0; i < uid.size; i++) {
+    if (uid.uidByte[i] < 0x10) uidStr += "0"; // thêm số 0 nếu < 0x10
+    uidStr += String(uid.uidByte[i], HEX);
+    if (i < uid.size - 1) uidStr += " ";
+  }
+  uidStr.toUpperCase(); // viết hoa để khớp
+  return uidStr;
+}
+
+bool isValidCard(String uidStr) {
+  for (String card : validCards) {
+    if (uidStr == card) return true;
+  }
+  return false;
 }
