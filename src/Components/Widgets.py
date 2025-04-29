@@ -12,7 +12,7 @@ import requests
 from PIL import Image, ImageTk
 
 from src.DetectPlateImage.MainDetectPlate import Detect_License_Plate
-
+from src.Communication.http_esp32 import ESP32_BASE_URL, set_angle
 
 def relative_to_assets(path: str) -> Path:
     ASSETS_PATH = Path(__file__).parent.parent / "assets"
@@ -85,6 +85,7 @@ class LivestreamWidget(Frame):
 
                     FrameWithPlates, plate_images = detect_license_plate(frame)
                     Detect_License_Plate(frame)
+
                     FrameWithPlates = cv2.resize(FrameWithPlates, (640, 480))
 
                     # Resize để giảm tải hệ thống
@@ -382,21 +383,7 @@ class ShowPlateImage(Frame):
         self.update_data_from_folder()  # Check for new images
         self.after(1000, self.auto_update)
 
-
-def send_request(direction):
-    try:
-        if direction == "up":
-            requests.get(RasPi_Base_URL + "/up")
-        elif direction == "down":
-            requests.get(RasPi_Base_URL + "/down")
-        elif direction == "right":
-            requests.get(RasPi_Base_URL + "/right")
-        elif direction == "left":
-            requests.get(RasPi_Base_URL + "/left")
-    except requests.RequestException as e:
-        print(f"Error sending request: {e}")
-
 # Hàm di chuyển camera
 def ButtonMoveCam(direction):
     # Chạy yêu cầu trong một luồng riêng biệt để không làm treo ứng dụng Tkinter
-    threading.Thread(target=send_request, args=(direction,)).start()
+    threading.Thread(target=set_angle, args=(direction,)).start()

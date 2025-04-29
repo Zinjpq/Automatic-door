@@ -2,11 +2,10 @@ from tkinter import Frame, Tk
 
 from src.Components import Widgets
 from src.Components.Widgets import AddLicensePlateText, ShowPlateImage, ButtonMoveCam
-
+from src.Communication.http_esp32 import CAMERA_URL,on_key_press
 
 def AlarmButton():
     print("AlarmButton clicked")
-
 
 class Sidebar(Frame):
     def __init__(self, parent, switch_screen_callback):
@@ -52,7 +51,7 @@ class HomeScene(BaseScene):
             color="#000000"  # Màu chữ
         )
 
-        self.livestream = Widgets.LivestreamWidget(self,use_local_camera=True)
+        self.livestream = Widgets.LivestreamWidget(self, camera_url= CAMERA_URL, use_local_camera=False)
         self.livestream.place(x=268 - 256, y=136)
         # folder =
         # AutoUpdateLicensePlateScene(self, parent, folder)
@@ -86,6 +85,7 @@ class CamControlScene(BaseScene):
         Widgets.add_image("image_Livestream.png", parent=self, x=300 - 256, y=88)
         Widgets.add_image("image_livestream2.png", parent=self, x=268 - 256, y=88)
         Widgets.add_image("image_ControlLabel.png", parent=self, x=920 - 256, y=136)
+        self.bind("<Key>", on_key_press)
 
         Widgets.create_time_and_date_labels(
             parent=self,
@@ -96,7 +96,7 @@ class CamControlScene(BaseScene):
         )
 
         # Library.add_image("image_Cameraerror.png", parent=self, x=268-256, y=136)
-        self.livestream = Widgets.LivestreamWidget(self, use_local_camera=True)
+        self.livestream = Widgets.LivestreamWidget(self, camera_url= CAMERA_URL, use_local_camera=False)
         self.livestream.place(x=268 - 256, y=136)
         buttons = [
             ("button_up.png", lambda: ButtonMoveCam("up"), 1045, 196),
