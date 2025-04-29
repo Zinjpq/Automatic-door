@@ -1,9 +1,10 @@
 # ✅ Task List
 
 ## App
-- [ ] request xuống esp32
+- [x] request xuống esp32
 - [ ] làm hiển thị ui cửa đã đóng hay mở
-- [ ] tính góc và gửi xuống esp32 
+- [x] tính góc và gửi xuống esp32 
+- [ ]
 ---
 
 ## Esp32
@@ -11,9 +12,10 @@
 - [x] in ra man hinh status cua cua
 ---
 ## Uno
-- [ ] tiệm cận
-- [ ] đóng mở cổng
+- [x] tiệm cận
+- [x] đóng mở cổng
 - [x] điều khiển servo pan tilt từ thông số gửi về từ esp32
-- [ ] đọc từ rfid
-- [ ] 
+- [x] đọc từ rfid
+- [x] door state
+- [x] Cảm biến hành trình
 ---
