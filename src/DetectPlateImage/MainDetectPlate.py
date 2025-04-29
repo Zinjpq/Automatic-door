@@ -4,6 +4,7 @@ import time
 import cv2
 
 from src.DetectPlateImage import DetectPlates, DetectChars
+from src.Communication.http_esp32 import sent_door_state
 
 # Biến lưu trữ biển số và thời gian lưu
 last_saved_plates = {}
@@ -38,6 +39,7 @@ def Detect_License_Plate(imgOriginalScene):
 
             # Kiểm tra xem biển số nhận diện có khớp với biển số trong file không
             if licPlate.strChars in valid_plates:
+                sent_door_state(1)
                 print(f"Plate {licPlate.strChars} is valid. Checking for recent save...")
 
                 current_time = time.time()  # Lấy thời gian hiện tại (theo giây)
