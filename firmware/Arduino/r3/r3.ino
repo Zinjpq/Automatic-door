@@ -29,15 +29,16 @@ bool isOpening = false;
 #define positionsensorClose A0  // Cam bien khi dong 
 #define positionsensorOpen A1  // Cam bien khi mo
 ////////////////////////////////////////////////////////////
-// Cau hinh cho UART 
+// Cau hinh cho UART
 #include <Arduino.h>
-String uartBuffer = "";
 ////////////////////////////////////////////////////////////
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 // SDA A4
 // SCL A5
- 
+
+char command = 'b';
+
 void setup() {
   Serial.begin(9600);
   ////////////////////////////////////////////////////////////
@@ -78,6 +79,18 @@ void setup() {
 }
 
 void loop() {
+  if (Serial.available()) {
+    command = Serial.read();
+    if (Serial.read() == 'o' && !isOpening && doorState == CLOSED) {
+      isOpening = true;
+      openDoor();
+      delay(6000);
+      closeDoorWithIRCheck();
+      isOpening = false;
+      command = 'b';
+    }
+  }
+
   if (!rfid.PICC_IsNewCardPresent()) return;
   if (!rfid.PICC_ReadCardSerial()) return;
   String uidStr = getCardUID(rfid.uid);
@@ -92,19 +105,6 @@ void loop() {
       closeDoorWithIRCheck();
       isOpening = false;
   }
-  
-  if (Serial.available()) {
-    char command = Serial.read();
-    if (command == 'o' && !isOpening && doorState == CLOSED) {
-      isOpening = true;
-      openDoor();
-      delay(6000);
-      closeDoorWithIRCheck();
-      isOpening = false;
-      command = 'b';
-    }
-  }
-
   rfid.PICC_HaltA();
   rfid.PCD_StopCrypto1();
 }

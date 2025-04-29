@@ -75,26 +75,37 @@
     ////////////////////////////////////////////////////////////
     // server set angle + door status
     server.on("/set_angle", []() {
-      if (server.hasArg("pan") && server.hasArg("tilt")&& server.hasArg("door")) {
+      if (server.hasArg("pan") && server.hasArg("tilt")) {
         // Khai bao 
         int pan = server.arg("pan").toInt();
         int tilt = server.arg("tilt").toInt();
-        int door = server.arg("door").toInt();
 
         panServo.write(pan);
         tiltServo.write(tilt);
         
-        // Gui xuong Uno
-        String command ="DOOR:" + String(door);
-        ////// PAN:90,TILT:90,DOOR:1 "PAN:" + String(pan) + ",TILT:" + String(tilt) + ",
-        UnoSerial.println("o");
+        // UnoSerial.println("o");
 
         server.send(200, "text/plain", "OK");
       } else {
         server.send(400, "text/plain", "Missing parameters");
       }
     });
-    // server door status
+    server.on("/door_state", []() {
+      if (server.hasArg("state")) {
+        int state = server.arg("state").toInt();
+
+        if (state == 0 || state == 1) {
+          String command = "DOOR:" + String(state);
+          UnoSerial.println('o'); // Gửi lệnh xuống Uno
+
+          server.send(200, "text/plain", "Door state set to " + String(state));
+        } else {
+          server.send(400, "text/plain", "Invalid state value (must be 0 or 1)");
+        }
+      } else {
+        server.send(400, "text/plain", "Missing state parameter");
+      }
+    });
     server.on("/door_status", []() {
       server.send(200, "text/plain", "Door status: " + doorStatusFromUNO);
     });
