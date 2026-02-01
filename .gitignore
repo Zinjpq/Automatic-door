@@ -1,13 +1,55 @@
-__pycache__
-.idea/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE
 .vscode/
-.Project Backup/
-*.pyc
-*.pyo
-*.pyd
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
 *.log
-*.workspace
-src/plate.txt
-simulations/Project Backups/Audo \[Autosaved\].pdsprj
-/simulations/Project Backups
-/firmware/Stm32/Debug
+logs/
+
+# Hardware/Config
+*.hex
+*.bin
+config_local.py
+
+# Environment variables
+.env
+.env.local
+
+# Project specific
+data/
+output/
+*.csv
